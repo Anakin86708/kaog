@@ -47,6 +47,10 @@ class KAssociado:
     def y(self) -> pd.Series:
         return self.data[NOME_COLUNA_Y]
 
+    @cached_property
+    def componentes(self):
+        return list(nx.algorithms.weakly_connected_components(self.grafo))
+
     def draw(self):
         nx.draw(self.grafo, with_labels=True)
         plt.show()
@@ -63,6 +67,20 @@ class KAssociado:
         """
         componente = self._obter_componentes_contendo(vertice_pertencente)
         return self._obter_media_grau_componente(componente) / (2 * self.k)
+
+    def media_grau_componentes(self) -> float:
+        """
+        Calcula a média do grau de **todos** os componentes contidos no grafo.
+
+        :return: Média do grau dos componentes.
+        :rtype: float
+        """
+        # Obter todos os componentes
+        gen_comp = nx.algorithms.weakly_connected_components(self.grafo)
+        graus = []
+        for comp in list(gen_comp):
+            graus.append(sum(map(self.grafo.degree, comp)))
+        return mean(graus)
 
     def _obter_componentes_contendo(self, vertice: int) -> Set[int]:
         """

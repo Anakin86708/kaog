@@ -80,6 +80,11 @@ class KAssociadoTest(unittest.TestCase):
         for idx, expec in expected.items():
             self.assertEqual(expec, instance.pureza(idx))
 
+    def test_media_grau_componentes(self):
+        instance = self._create_new_instance()
+        expected = 14
+        self.assertEqual(expected, instance.media_grau_componentes())
+
     ################
     # Util methods #
     ################
