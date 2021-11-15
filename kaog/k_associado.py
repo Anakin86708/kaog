@@ -47,7 +47,7 @@ class KAssociado:
     def y(self) -> pd.Series:
         return self.data[NOME_COLUNA_Y]
 
-    @cached_property
+    @property
     def componentes(self) -> List[frozenset[int]]:
         return list(map(frozenset, nx.algorithms.weakly_connected_components(self.grafo)))
 
@@ -108,6 +108,9 @@ class KAssociado:
                 return frozenset(comp)
         raise ValueError(f'O vértice {vertice} não pertence a nenhuma componente.')
 
+    def adicionar_arestas(self, novas_arestas):
+        self.grafo.add_edges_from(novas_arestas)
+
     def _obter_media_grau_componente(self, componente: Union[Set[int], frozenset[int]]) -> float:
         """
         Obtém a média do grau dos vértices do componente conectado ao vértice.
@@ -120,8 +123,8 @@ class KAssociado:
         """
         graus = [self.grafo.degree(i) for i in componente]
         return mean(graus)
-
     # noinspection PyTypeChecker
+
     def _determinar_vizinhos(self) -> Dict[int, pd.Index]:
         """
         Determina os `k` vizinhos mais próximos de cada vértice, apenas se foram de mesma classe.
