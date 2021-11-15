@@ -10,6 +10,14 @@ class Distancias:
     METRIC = 'euclidean'
 
     def __init__(self, k: int, x: pd.DataFrame):
+        """
+        Calcula as distâncias e vizinhos mais próximos de cada ponto utilizando a métrica da classe.
+
+        :param k: Quantidade de vizinhos mais próximos.
+        :type k: int
+        :param x: Dados de entrada.
+        :type x: pandas.DataFrame
+        """
         self._k = k
         self.x = x.copy()
         self.index_map = self._create_map_pandas_to_numpy()
@@ -24,6 +32,10 @@ class Distancias:
     def vizinhos(self) -> np.ndarray:
         """Compensar pelo primeiro valor que corresponde ao mesmo ponto"""
         return self._vizinhos[:, 1:]
+
+    @cached_property
+    def rever_index_max(self):
+        return {v: k for k, v in self.index_map.items()}
 
     @property
     def k(self):
@@ -65,4 +77,11 @@ class Distancias:
         :return: Índices dos vizinhos mais próximos.
         :rtype: numpy.ndarray
         """
-        return self.vizinhos[self.index_map[indice]]
+        numpy_indice_ = self.vizinhos[self.index_pandas_to_numpy(indice)]
+        return np.array(list(map(self.index_numpy_to_pandas, numpy_indice_)))
+
+    def index_pandas_to_numpy(self, index: int) -> int:
+        return self.index_map[index]
+
+    def index_numpy_to_pandas(self, index: int) -> int:
+        return self.rever_index_max[index]
