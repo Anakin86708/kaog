@@ -1,6 +1,8 @@
 from functools import cached_property
-from typing import Dict
+from statistics import mean
+from typing import Dict, Set
 
+import matplotlib.pyplot as plt
 import networkx as nx
 import pandas as pd
 
@@ -27,7 +29,11 @@ class KAssociado:
         vizinhos = self._determinar_vizinhos()
 
         self._edgelist = self._create_edgelist(vizinhos)
-        self.grafo = nx.from_edgelist(self._edgelist)
+        self.grafo = self._criar_grafo()
+
+    @property
+    def k(self):
+        return self._k
 
     @property
     def data(self) -> pd.DataFrame:
@@ -40,6 +46,52 @@ class KAssociado:
     @cached_property
     def y(self) -> pd.Series:
         return self.data[NOME_COLUNA_Y]
+
+    def draw(self):
+        nx.draw(self.grafo, with_labels=True)
+        plt.show()
+
+    def pureza(self, vertice_pertencente: int) -> float:
+        """
+        Calcula a pureza do componente ao qual o vértice pertence.
+
+        :param vertice_pertencente: Vértice contido no componente a ser calculado.
+        :type vertice_pertencente: int
+        :return: Valor da pureza do componente.
+        :rtype: float
+        :raises ValueError: Se o vértice não pertence a nenhum componente.
+        """
+        componente = self._obter_componentes_contendo(vertice_pertencente)
+        return self._obter_media_grau_componente(componente) / (2 * self.k)
+
+    def _obter_componentes_contendo(self, vertice: int) -> Set[int]:
+        """
+        Obtém o componente conectado ao vértice.
+
+        :param vertice: Vértice a ser buscado.
+        :type vertice: int
+        :return: Componente conectado ao vértice.
+        :rtype: Set[int]
+        :raises ValueError: Se o vértice não estiver conectado ao grafo.
+        """
+        gen_comp = nx.algorithms.weakly_connected_components(self.grafo)
+        for comp in gen_comp:
+            if vertice in comp:
+                return comp
+        raise ValueError(f'O vértice {vertice} não pertence a nenhuma componente.')
+
+    def _obter_media_grau_componente(self, componente: Set[int]) -> float:
+        """
+        Obtém a média do grau dos vértices do componente conectado ao vértice.
+
+        :param componente: Vértice a ser buscado.
+        :type componente: Set[int]
+        :return: Média do grau dos vértices do componente conectado ao vértice.
+        :rtype: float
+        :raises ValueError: Se o vértice não estiver conectado ao grafo.
+        """
+        graus = [self.grafo.degree(i) for i in componente]
+        return mean(graus)
 
     # noinspection PyTypeChecker
     def _determinar_vizinhos(self) -> Dict[int, pd.Index]:
@@ -58,5 +110,11 @@ class KAssociado:
             vizinhos[idx] = vizinhos_
         return vizinhos
 
-    def _create_edgelist(self, vizinhos):
+    @staticmethod
+    def _create_edgelist(vizinhos):
         return [(x, y) for x in vizinhos for y in vizinhos[x]]
+
+    def _criar_grafo(self):
+        graph = nx.DiGraph()
+        graph.add_edges_from(self._edgelist)
+        return graph
