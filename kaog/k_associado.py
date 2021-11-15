@@ -1,6 +1,6 @@
 from functools import cached_property
 from statistics import mean
-from typing import Dict, Set
+from typing import Dict, Set, Union
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -55,16 +55,26 @@ class KAssociado:
         nx.draw(self.grafo, with_labels=True)
         plt.show()
 
-    def pureza(self, vertice_pertencente: int) -> float:
+    def pureza(self, componente: Union[int, Set[int]]) -> float:
         """
         Calcula a pureza do componente ao qual o vértice pertence.
 
-        :param vertice_pertencente: Vértice contido no componente a ser calculado.
-        :type vertice_pertencente: int
+        :param componente: Vértice contido no componente a ser calculado ou todo o componente.
+        :type componente: Union[int, Set[int]]
         :return: Valor da pureza do componente.
         :rtype: float
-        :raises ValueError: Se o vértice não pertence a nenhum componente.
+        :raises ValueError: Se o componente ou vértice não pertence ao grafo.
+        :raises TypeError: Se o tipo do argumento `componente` não for int ou Set[int].
         """
+        if isinstance(componente, set):
+            if componente not in self.componentes:
+                raise ValueError(f'O componente {componente} não pertence ao grafo.')
+            vertice_pertencente = next(iter(componente))
+        elif isinstance(componente, int):
+            vertice_pertencente = componente
+        else:
+            raise TypeError(f'O argumento `componente` deve ser int ou Set[int].')
+
         componente = self._obter_componentes_contendo(vertice_pertencente)
         return self._obter_media_grau_componente(componente) / (2 * self.k)
 
