@@ -28,10 +28,9 @@ class Distancias:
         """Compensar pelo primeiro valor que corresponde ao mesmo ponto"""
         return self._distancias[:, 1:]
 
-    @cached_property
+    @property
     def vizinhos(self) -> np.ndarray:
-        """Compensar pelo primeiro valor que corresponde ao mesmo ponto"""
-        return self._vizinhos[:, 1:]
+        return self._vizinhos
 
     @cached_property
     def rever_index_max(self):
@@ -63,9 +62,20 @@ class Distancias:
         """
         # TODO: implementar o HEOM
         # Compensação para o primeiro vizinho que corresponde ao próprio ponto.
-        k_ = self.k + 1
+        k_ = self.x.shape[0]
         nn = NearestNeighbors(n_neighbors=k_, metric=self.METRIC, n_jobs=-1).fit(self.x)
-        return nn.kneighbors(self.x)
+        # Remover o vizinho que corresponda ao próprio ponto.
+        distances_, kneighbors_ = nn.kneighbors(self.x)
+        distances = np.zeros((k_, k_ - 1), dtype=float)
+        kneighbors = np.zeros((k_, k_ - 1), dtype=int)
+        for idx, line in enumerate(kneighbors_):
+            idx_buscado = np.where(line == idx)[0][0]
+            line[idx_buscado] = -1
+            kneighbors[idx] = np.array(list(filter(lambda x: x != -1, line)))
+            distances_[idx][idx_buscado] = -1
+            distances[idx] = np.array(list(filter(lambda x: x != -1, distances_[idx])))
+
+        return distances, kneighbors
 
     def vizinhos_mais_proximos_de(self, indice: int) -> np.ndarray:
         """

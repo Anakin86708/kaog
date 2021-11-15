@@ -52,7 +52,10 @@ class KAssociado:
         return list(map(frozenset, nx.algorithms.weakly_connected_components(self.grafo)))
 
     def draw(self):
-        nx.draw(self.grafo, with_labels=True)
+        SCALA_FIG = 2.5
+        fig = plt.figure(figsize=(6.4 * SCALA_FIG, 4.8 * SCALA_FIG))
+        ax = fig.gca()
+        nx.draw(self.grafo, with_labels=True, ax=ax)
         plt.show()
 
     def pureza(self, componente: Union[int, Set[int], frozenset[int]]) -> float:
