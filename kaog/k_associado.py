@@ -1,6 +1,6 @@
 from functools import cached_property
 from statistics import mean
-from typing import Dict, Set, Union
+from typing import Dict, Set, Union, List
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -48,14 +48,14 @@ class KAssociado:
         return self.data[NOME_COLUNA_Y]
 
     @cached_property
-    def componentes(self):
-        return list(nx.algorithms.weakly_connected_components(self.grafo))
+    def componentes(self) -> List[frozenset[int]]:
+        return list(map(frozenset, nx.algorithms.weakly_connected_components(self.grafo)))
 
     def draw(self):
         nx.draw(self.grafo, with_labels=True)
         plt.show()
 
-    def pureza(self, componente: Union[int, Set[int]]) -> float:
+    def pureza(self, componente: Union[int, Set[int], frozenset[int]]) -> float:
         """
         Calcula a pureza do componente ao qual o vértice pertence.
 
@@ -66,16 +66,16 @@ class KAssociado:
         :raises ValueError: Se o componente ou vértice não pertence ao grafo.
         :raises TypeError: Se o tipo do argumento `componente` não for int ou Set[int].
         """
-        if isinstance(componente, set):
+        if isinstance(componente, set) or isinstance(componente, frozenset):
             if componente not in self.componentes:
                 raise ValueError(f'O componente {componente} não pertence ao grafo.')
             vertice_pertencente = next(iter(componente))
         elif isinstance(componente, int):
             vertice_pertencente = componente
         else:
-            raise TypeError(f'O argumento `componente` deve ser int ou Set[int].')
+            raise TypeError(f'O argumento `componente` deve ser int, Set[int] ou frozenset[int].')
 
-        componente = self._obter_componentes_contendo(vertice_pertencente)
+        componente = self.obter_componentes_contendo(vertice_pertencente)
         return self._obter_media_grau_componente(componente) / (2 * self.k)
 
     def media_grau_componentes(self) -> float:
@@ -92,7 +92,7 @@ class KAssociado:
             graus.append(sum(map(self.grafo.degree, comp)))
         return mean(graus)
 
-    def _obter_componentes_contendo(self, vertice: int) -> Set[int]:
+    def obter_componentes_contendo(self, vertice: int) -> frozenset[int]:
         """
         Obtém o componente conectado ao vértice.
 
@@ -105,10 +105,10 @@ class KAssociado:
         gen_comp = nx.algorithms.weakly_connected_components(self.grafo)
         for comp in gen_comp:
             if vertice in comp:
-                return comp
+                return frozenset(comp)
         raise ValueError(f'O vértice {vertice} não pertence a nenhuma componente.')
 
-    def _obter_media_grau_componente(self, componente: Set[int]) -> float:
+    def _obter_media_grau_componente(self, componente: Union[Set[int], frozenset[int]]) -> float:
         """
         Obtém a média do grau dos vértices do componente conectado ao vértice.
 

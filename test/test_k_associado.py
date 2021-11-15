@@ -66,7 +66,7 @@ class KAssociadoTest(unittest.TestCase):
         instance = self._create_new_instance()
         expected = {2: {0, 1, 2, 6}, 3: {3, 4, 5}}
         for idx, expec in expected.items():
-            self.assertEqual(expec, instance._obter_componentes_contendo(idx))
+            self.assertEqual(expec, instance.obter_componentes_contendo(idx))
 
     def test_obter_media_grau_componente(self):
         instance = self._create_new_instance()
