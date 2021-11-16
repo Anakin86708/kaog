@@ -1,10 +1,13 @@
 from functools import cached_property
+from itertools import cycle
 from statistics import mean
 from typing import Dict, Set, Union, List
 
 import matplotlib.pyplot as plt
 import networkx as nx
 import pandas as pd
+from matplotlib.lines import Line2D
+from sklearn.preprocessing import MinMaxScaler
 
 from kaog import NOME_COLUNA_Y
 from kaog.distancias import Distancias
@@ -56,7 +59,27 @@ class KAssociado:
         fig = plt.figure(figsize=(6.4 * SCALA_FIG, 4.8 * SCALA_FIG))
         ax = fig.gca()
         pos = nx.kamada_kawai_layout(self.grafo)
-        nx.draw(self.grafo, with_labels=True, ax=ax, pos=pos)
+        markers = [*Line2D.markers.keys()][3:-4]
+        y_unique = self.y.unique()
+        replace = {k: v for k, v in zip(y_unique, cycle(markers))}
+        scaller = MinMaxScaler()
+        scaller.fit(y_unique.reshape(-1, 1))
+        # Iterar os vértices de cada classe
+        for i, classe in enumerate(y_unique):
+            vertices = self.data[self.data[NOME_COLUNA_Y] == classe].index
+            # color = scaller.transform(np.array([1]).reshape(1, -1))[0][0]
+            nx.draw(
+                self.grafo,
+                nodelist=vertices,
+                with_labels=True,
+                ax=ax,
+                pos=pos,
+                node_shape=replace[classe],
+                node_color=[i] * len(vertices),
+                cmap=plt.cm.get_cmap('plasma'),
+                vmin=scaller.data_min_[0],
+                vmax=scaller.data_max_[0],
+            )
         plt.show()
 
     def pureza(self, componente: Union[int, Set[int], frozenset[int]]) -> float:
