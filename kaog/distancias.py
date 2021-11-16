@@ -29,7 +29,8 @@ class Distancias:
 
     @property
     def vizinhos(self) -> np.ndarray:
-        return self._vizinhos[:, :self.k]
+        """Apenas os índices para os vizinhos, **sem considerar** as informações de classes!"""
+        return self._vizinhos
 
     @cached_property
     def rever_index_max(self):
@@ -83,9 +84,11 @@ class Distancias:
         k_ = self.x.shape[0]
         nn = NearestNeighbors(n_neighbors=k_, metric=self.METRIC, n_jobs=-1, algorithm='ball_tree').fit(self.x)
 
-        # Remover o vizinho e distância que corresponda ao próprio ponto.
-        distances_, kneighbors_ = nn.kneighbors(self.x)
-        distances, kneighbors = self._remover_distancia_vizinho_mesmo_ponto(k_, distances_, kneighbors_)
+        distances, kneighbors = nn.kneighbors(n_neighbors=self.k, return_distance=True)
+        for i, (d, k) in enumerate(zip(distances, kneighbors)):
+            sort_idx = np.lexsort((k, d))
+            distances[i] = d[sort_idx]
+            kneighbors[i] = k[sort_idx]
 
         return distances, kneighbors
 

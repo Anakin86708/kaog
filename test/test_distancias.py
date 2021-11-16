@@ -43,8 +43,8 @@ class DistanciasTest(unittest.TestCase):
             distancias, vizinhos = instance._calcular_distancias_e_vizinhos()
             self.assertEqual(x.shape[0], vizinhos.shape[0])
             self.assertEqual(x.shape[0], distancias.shape[0])
-            self.assertEqual(x.shape[0] - 1, vizinhos.shape[1])
-            self.assertEqual(x.shape[0] - 1, distancias.shape[1])
+            self.assertEqual(k, vizinhos.shape[1])
+            self.assertEqual(k, distancias.shape[1])
 
     def test_vizinhos_mais_proximos_de(self):
         k, x = self.k, self.x.copy()
@@ -53,6 +53,13 @@ class DistanciasTest(unittest.TestCase):
         proximos = instance.vizinhos_mais_proximos_de(6)
         expected = np.array([0, 1])
         np.testing.assert_array_equal(expected, proximos)
+
+    def test_distancias_is_sorted(self):
+        k, x = self.k, self.x.copy()
+        instance = Distancias(k, x)
+
+        distancias = instance.distancias
+        self.assertTrue(np.all(np.diff(distancias) >= 0))
 
         if __name__ == '__main__':
             unittest.main()
