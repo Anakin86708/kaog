@@ -11,5 +11,8 @@ x = pd.DataFrame(iris.data, columns=iris.feature_names)
 x = x.drop(columns=['sepal width (cm)', 'petal length (cm)'])
 y = pd.DataFrame(iris.target, columns=['target'])
 data = pd.concat([x, y], axis=1)
+data = data.drop_duplicates()
 
 kaog = KAOG(data)
+# %%
+kaog.grafo_otimo.draw()

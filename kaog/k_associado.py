@@ -55,7 +55,8 @@ class KAssociado:
         SCALA_FIG = 2.5
         fig = plt.figure(figsize=(6.4 * SCALA_FIG, 4.8 * SCALA_FIG))
         ax = fig.gca()
-        nx.draw(self.grafo, with_labels=True, ax=ax)
+        pos = nx.kamada_kawai_layout(self.grafo)
+        nx.draw(self.grafo, with_labels=True, ax=ax, pos=pos)
         plt.show()
 
     def pureza(self, componente: Union[int, Set[int], frozenset[int]]) -> float:
@@ -140,6 +141,7 @@ class KAssociado:
             vizinhos_ = self.distancias.vizinhos_mais_proximos_de(idx)
             # Verificar as classes
             y_vizinhos = self.y[vizinhos_]
+            # Manter apenas os vizinhos que pertençam a mesma classe
             vizinhos_ = y_vizinhos.where(y_vizinhos == self.y[idx]).dropna().index
             vizinhos[idx] = vizinhos_
         return vizinhos
@@ -150,5 +152,6 @@ class KAssociado:
 
     def _criar_grafo(self):
         graph = nx.DiGraph()
+        graph.add_nodes_from(self.x.index)
         graph.add_edges_from(self._edgelist)
         return graph
