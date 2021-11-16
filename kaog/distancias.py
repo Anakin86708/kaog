@@ -23,14 +23,13 @@ class Distancias:
         self.index_map = self._create_map_pandas_to_numpy()
         self._distancias, self._vizinhos = self._calcular_distancias_e_vizinhos()
 
-    @cached_property
+    @property
     def distancias(self):
-        """Compensar pelo primeiro valor que corresponde ao mesmo ponto"""
-        return self._distancias[:, 1:]
+        return self._distancias
 
     @property
     def vizinhos(self) -> np.ndarray:
-        return self._vizinhos
+        return self._vizinhos[:, :self.k]
 
     @cached_property
     def rever_index_max(self):
@@ -44,38 +43,6 @@ class Distancias:
     def k(self, k: int):
         self._k = k
         self._distancias, self._vizinhos = self._calcular_distancias_e_vizinhos()
-
-    def _create_map_pandas_to_numpy(self) -> Dict[int, int]:
-        """
-        Mapear cada índice da coluna do DataFrame para um número inteiro respectivo a linha da matriz.
-        :return: Dicionário com o índice do DataFrame como chave e o índice da matriz como valor.
-        :rtype: Dict[int, int]
-        """
-        return {k: v for v, k in enumerate(self.x.index)}
-
-    def _calcular_distancias_e_vizinhos(self) -> (np.ndarray, np.ndarray):
-        """
-        Cria uma matriz de distâncias entre os pontos de `self.x`, assim como os índices dos vizinhos mais próximos.
-
-        :return: Matriz de distâncias e matriz com os vizinhos mais próximos.
-        :rtype: Tuple[numpy.ndarray, numpy.ndarray]
-        """
-        # TODO: implementar o HEOM
-        # Compensação para o primeiro vizinho que corresponde ao próprio ponto.
-        k_ = self.x.shape[0]
-        nn = NearestNeighbors(n_neighbors=k_, metric=self.METRIC, n_jobs=-1).fit(self.x)
-        # Remover o vizinho que corresponda ao próprio ponto.
-        distances_, kneighbors_ = nn.kneighbors(self.x)
-        distances = np.zeros((k_, k_ - 1), dtype=float)
-        kneighbors = np.zeros((k_, k_ - 1), dtype=int)
-        for idx, line in enumerate(kneighbors_):
-            idx_buscado = np.where(line == idx)[0][0]
-            line[idx_buscado] = -1
-            kneighbors[idx] = np.array(list(filter(lambda x: x != -1, line)))
-            distances_[idx][idx_buscado] = -1
-            distances[idx] = np.array(list(filter(lambda x: x != -1, distances_[idx])))
-
-        return distances, kneighbors
 
     def vizinhos_mais_proximos_de(self, indice: int) -> np.ndarray:
         """
@@ -95,3 +62,41 @@ class Distancias:
 
     def index_numpy_to_pandas(self, index: int) -> int:
         return self.rever_index_max[index]
+
+    def _create_map_pandas_to_numpy(self) -> Dict[int, int]:
+        """
+        Mapear cada índice da coluna do DataFrame para um número inteiro respectivo a linha da matriz.
+        :return: Dicionário com o índice do DataFrame como chave e o índice da matriz como valor.
+        :rtype: Dict[int, int]
+        """
+        return {k: v for v, k in enumerate(self.x.index)}
+
+    def _calcular_distancias_e_vizinhos(self) -> (np.ndarray, np.ndarray):
+        """
+        Cria um array de **todas** as distâncias entre os pontos de `self.x`, assim como os índices dos vizinhos mais
+        próximos. Não leva em consideração as classes, apenas as distâncias.
+
+        :return: Array de distâncias e array com os vizinhos mais próximos.
+        :rtype: Tuple[numpy.ndarray, numpy.ndarray]
+        """
+        # TODO: implementar o HEOM
+        k_ = self.x.shape[0]
+        nn = NearestNeighbors(n_neighbors=k_, metric=self.METRIC, n_jobs=-1, algorithm='ball_tree').fit(self.x)
+
+        # Remover o vizinho e distância que corresponda ao próprio ponto.
+        distances_, kneighbors_ = nn.kneighbors(self.x)
+        distances, kneighbors = self._remover_distancia_vizinho_mesmo_ponto(k_, distances_, kneighbors_)
+
+        return distances, kneighbors
+
+    def _remover_distancia_vizinho_mesmo_ponto(self, k_, distances_, kneighbors_):
+        replace = -1
+        distances = np.zeros((k_, k_ - 1), dtype=float)
+        kneighbors = np.zeros((k_, k_ - 1), dtype=int)
+        for idx, line in enumerate(kneighbors_):
+            idx_buscado = np.where(line == idx)[0][0]  # Encontra o índice do ponto em questão.
+            line[idx_buscado] = replace
+            kneighbors[idx] = np.array(list(filter(lambda x: x != replace, line)))
+            distances_[idx][idx_buscado] = replace
+            distances[idx] = np.array(list(filter(lambda x: x != replace, distances_[idx])))
+        return distances, kneighbors

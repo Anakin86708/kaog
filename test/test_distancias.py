@@ -41,10 +41,10 @@ class DistanciasTest(unittest.TestCase):
         for k in range(self.k, x.shape[0]):
             instance.k = k
             distancias, vizinhos = instance._calcular_distancias_e_vizinhos()
-            for v, d in zip(vizinhos, distancias):
-                # Compensação para o primeiro vizinho que corresponde ao próprio ponto.
-                self.assertEqual(k, len(v) - 1)
-                self.assertEqual(k, len(d) - 1)
+            self.assertEqual(x.shape[0], vizinhos.shape[0])
+            self.assertEqual(x.shape[0], distancias.shape[0])
+            self.assertEqual(x.shape[0] - 1, vizinhos.shape[1])
+            self.assertEqual(x.shape[0] - 1, distancias.shape[1])
 
     def test_vizinhos_mais_proximos_de(self):
         k, x = self.k, self.x.copy()
