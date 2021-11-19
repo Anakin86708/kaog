@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pandas as pd
 from matplotlib.lines import Line2D
+from sklearn.manifold import TSNE
 from sklearn.preprocessing import MinMaxScaler
 
 from kaog import NOME_COLUNA_Y
@@ -64,16 +65,25 @@ class KAssociado:
         replace = {k: v for k, v in zip(y_unique, cycle(markers))}
         scaller = MinMaxScaler()
         scaller.fit(y_unique.reshape(-1, 1))
+
+        # Obeter coordenadas utilizando t-SNE
+        tsne = TSNE(init='pca', learning_rate='auto', n_jobs=-1)
+        tsne_cords = pd.DataFrame(tsne.fit_transform(self.x), index=self.x.index)
+
         # Iterar os vértices de cada classe
         for i, classe in enumerate(y_unique):
             vertices = self.data[self.data[NOME_COLUNA_Y] == classe].index
             # color = scaller.transform(np.array([1]).reshape(1, -1))[0][0]
+            cords = tsne_cords.to_dict(orient='index')
+            for k, v in cords.items():
+                cords[k] = [x for x in v.values()]
+
             nx.draw(
                 self.grafo,
                 nodelist=vertices,
                 with_labels=True,
                 ax=ax,
-                pos=pos,
+                pos=cords,
                 node_shape=replace[classe],
                 node_color=[i] * len(vertices),
                 cmap=plt.cm.get_cmap('plasma'),
