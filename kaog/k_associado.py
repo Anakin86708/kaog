@@ -56,8 +56,12 @@ class KAssociado:
         return list(map(frozenset, nx.algorithms.weakly_connected_components(self.grafo)))
 
     def draw(self):
-        SCALA_FIG = 2.5
-        fig = plt.figure(figsize=(6.4 * SCALA_FIG, 4.8 * SCALA_FIG))
+        """
+        Realiza o plot do grafo. Para dados em `self.x` que estejam em 2D, o plot é feito sem t-SNE, enquanto maiores
+        dimensões são plotados com t-SNE.
+        """
+        scala_fig = 2.5
+        fig = plt.figure(figsize=(6.4 * scala_fig, 4.8 * scala_fig))
         ax = fig.gca()
         pos = nx.kamada_kawai_layout(self.grafo)
         markers = [*Line2D.markers.keys()][3:-4]
@@ -67,16 +71,12 @@ class KAssociado:
         scaller.fit(y_unique.reshape(-1, 1))
 
         # Obeter coordenadas utilizando t-SNE
-        tsne = TSNE(init='pca', learning_rate='auto', n_jobs=-1)
-        tsne_cords = pd.DataFrame(tsne.fit_transform(self.x), index=self.x.index)
+        cords = self._get_coords()
 
         # Iterar os vértices de cada classe
         for i, classe in enumerate(y_unique):
             vertices = self.data[self.data[NOME_COLUNA_Y] == classe].index
             # color = scaller.transform(np.array([1]).reshape(1, -1))[0][0]
-            cords = tsne_cords.to_dict(orient='index')
-            for k, v in cords.items():
-                cords[k] = [x for x in v.values()]
 
             nx.draw(
                 self.grafo,
@@ -91,6 +91,21 @@ class KAssociado:
                 vmax=scaller.data_max_[0],
             )
         plt.show()
+
+    def _get_coords(self):
+        if self.x.shape[1] == 2:
+            # 2D, não precisa de t-SNE
+            cords = self.x.to_dict(orient='index')
+        else:
+            # Precisa de t-SNE
+            tsne = TSNE(init='pca', learning_rate='auto', n_jobs=-1)
+            tsne_cords = pd.DataFrame(tsne.fit_transform(self.x), index=self.x.index)
+            cords = tsne_cords.to_dict(orient='index')
+
+        # Remover os dicionários internos e utilizar listas
+        for k, v in cords.items():
+            cords[k] = [x for x in v.values()]
+        return cords
 
     def pureza(self, componente: Union[int, Set[int], frozenset[int]]) -> float:
         """
