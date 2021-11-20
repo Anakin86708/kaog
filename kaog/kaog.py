@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Dict
 
 import numpy as np
@@ -53,7 +54,7 @@ class KAOG:
     def _criar_grafo_associado(self, k):
         k_associado = KAssociado(k, self.data)
         self.grafos_associados[k] = k_associado
-        return k_associado
+        return deepcopy(k_associado)
 
     def _calcular_ultima_taxa(self):
         k = len(self.grafos_associados)
