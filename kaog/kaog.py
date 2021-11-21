@@ -4,11 +4,13 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
+from kaog import NOME_COLUNA_Y
 from kaog._grafo_otimo import GrafoOtimo
 from kaog.k_associado import KAssociado
+from kaog.util.draw import DrawableGraph
 
 
-class KAOG:
+class KAOG(DrawableGraph):
     def __init__(self, data: pd.DataFrame):
         self._data = data.copy()
 
@@ -19,6 +21,22 @@ class KAOG:
     @property
     def data(self):
         return self._data.copy()
+
+    @property
+    def x(self):
+        return self.data.drop(NOME_COLUNA_Y, axis=1)
+
+    @property
+    def y(self):
+        return self.data[NOME_COLUNA_Y]
+
+    @property
+    def grafo(self):
+        return self.grafo_otimo
+
+    @property
+    def componentes(self):
+        return self.grafo_otimo.componentes
 
     def _criar_kaog(self):
         k = 1

@@ -15,7 +15,11 @@ data = data.drop_duplicates()
 
 kaog = KAOG(data)
 # %%
-# kaog.grafo_otimo.draw()
+kaog.draw()
 
 # %%
-# kaog.grafo_otimo.draw(True)
+kaog.draw(True)
+
+# %%
+kaog.grafos_associados[1].draw()
+kaog.grafos_associados[1].draw(True)
