@@ -54,7 +54,11 @@ class KAssociado:
 
     @property
     def componentes(self) -> List[frozenset[int]]:
-        return list(map(frozenset, nx.algorithms.weakly_connected_components(self.grafo)))
+        return list(map(frozenset, self._gen_componentes()))
+
+    def _gen_componentes(self):
+        """Gerador para os componentes do grafo."""
+        return nx.algorithms.weakly_connected_components(self.grafo)
 
     def draw(self, color_by_component=False):
         """
@@ -83,7 +87,6 @@ class KAssociado:
         else:
             self._draw_color_by_class(ax, cords, replace, scaller, y_unique)
 
-
     def pureza(self, componente: Union[int, Set[int], frozenset[int]]) -> float:
         """
         Calcula a pureza do componente ao qual o vértice pertence.
@@ -95,6 +98,23 @@ class KAssociado:
         :raises ValueError: Se o componente ou vértice não pertence ao grafo.
         :raises TypeError: Se o tipo do argumento `componente` não for int ou Set[int].
         """
+        vertice_pertencente = self._sanitize_pureza(componente)
+
+        componente = self.obter_componentes_contendo(vertice_pertencente)
+        pureza = self._obter_media_grau_componente(componente) / (2 * self.k)
+        if not 0 <= pureza <= 1:
+            raise RuntimeError(f'O valor da pureza do componente {componente} é {pureza}, fora do intervalo [1,0].')
+        return pureza
+
+    def _sanitize_pureza(self, componente: Union[int, Set[int], frozenset[int]]):
+        """
+        Com base no tipo do componente, retorna ao menos um vértice pertencente ao componente.
+
+        :param componente: Podem ser um vértice ou um conjunto de vértices.
+        :type componente: Union[int, Set[int]]
+        :return: Vértice pertencente ao componente.
+        :rtype: int
+        """
         if isinstance(componente, set) or isinstance(componente, frozenset):
             if componente not in self.componentes:
                 raise ValueError(f'O componente {componente} não pertence ao grafo.')
@@ -103,13 +123,9 @@ class KAssociado:
             vertice_pertencente = componente
         else:
             raise TypeError(f'O argumento `componente` deve ser int, Set[int] ou frozenset[int].')
+        return vertice_pertencente
 
-        componente = self.obter_componentes_contendo(vertice_pertencente)
-        pureza = self._obter_media_grau_componente(componente) / (2 * self.k)
-        if not 0 <= pureza <= 1:
-            raise RuntimeError(f'O valor da pureza do componente {componente} é {pureza}, fora do intervalo [1,0].')
-        return pureza
-
+    # noinspection PyTypeChecker
     def media_grau_componentes(self) -> float:
         """
         Calcula a média do grau de **todos** os componentes contidos no grafo.
@@ -131,14 +147,13 @@ class KAssociado:
         :param vertice: Vértice a ser buscado.
         :type vertice: int
         :return: Componente conectado ao vértice.
-        :rtype: Set[int]
+        :rtype: frozenset[int]
         :raises ValueError: Se o vértice não estiver conectado ao grafo.
         """
-        gen_comp = nx.algorithms.weakly_connected_components(self.grafo)
-        for comp in gen_comp:
+        for comp in self._gen_componentes():
             if vertice in comp:
                 return frozenset(comp)
-        raise ValueError(f'O vértice {vertice} não pertence a nenhuma componente.')
+        raise ValueError(f'O vértice {vertice} não pertence a nenhum componente.')
 
     def adicionar_arestas(self, novas_arestas):
         self.grafo.add_edges_from(novas_arestas)

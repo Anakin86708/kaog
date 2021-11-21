@@ -40,7 +40,7 @@ class KAOGTest(unittest.TestCase):
         k = 2
         mock_grafos_associados = {k: KAssociado(k, data), k + 1: None}
         assert len(mock_grafos_associados) == k
-        instance.grafos_associados = mock_grafos_associados
+        instance.componentes = mock_grafos_associados
 
         taxa = instance._calcular_ultima_taxa()
         expected = 7
