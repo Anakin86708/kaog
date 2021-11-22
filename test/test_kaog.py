@@ -23,9 +23,21 @@ class KAOGTest(unittest.TestCase):
         self.y = pd.Series([0, 0, 0, 1, 1, 1, 0, 0, 0], index=self.x.index, name=NOME_COLUNA_Y)
         self.data = pd.concat([self.x, self.y], axis=1)
 
-    def test_kaog(self):
+    def test_instance_kaog(self):
         instance = KAOG(self.data.copy())
         self.assertIsInstance(instance, KAOG)
+
+    def test_criar_kaog(self):
+        pass
+
+    def test_calcular_pureza_componentes_otimos(self):
+        pass
+
+    def test_obter_componentes_otimos(self):
+        pass
+
+    def test_iniciar_grafo_otimo(self):
+        pass
 
     def test_criar_grafo_associado(self):
         instance = KAOG(self.data.copy())
@@ -38,22 +50,18 @@ class KAOGTest(unittest.TestCase):
         data = self.data.iloc[:7].copy()
         instance = KAOG(data.copy())
         k = 2
-        mock_grafos_associados = {k: KAssociado(k, data), k + 1: None}
+        mock_grafos_associados = {k: KAssociado(k, data), k - 1: None}
         assert len(mock_grafos_associados) == k
-        instance.componentes = mock_grafos_associados
+        instance.grafos_associados = mock_grafos_associados
 
         taxa = instance._calcular_ultima_taxa()
         expected = 7
         self.assertEqual(expected, taxa)
 
-    def test_obter_componentes_otimo(self):
-        instance = KAOG(self.data)
-        k = 1
-        grafo_otimo = KAssociado(k, self.data)
-        componente_k = frozenset({0, 1, 2, 6, 7, 8})
-        expected = [frozenset({0, 1, 2, 6}), frozenset({8, 7})]
-        componentes_otimo = instance._obter_componentes_otimo(componente_k, grafo_otimo)
-        self.assertEqual(expected, componentes_otimo)
+    def test_inserir_novo_componente_otimo(self):
+        data = self.data.copy()
+        instance = KAOG(self.data.copy())
+        pass
 
 
 if __name__ == '__main__':

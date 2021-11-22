@@ -1,6 +1,5 @@
 import unittest
 
-import networkx as nx
 import pandas as pd
 from sklearn.datasets import load_iris
 
@@ -31,9 +30,23 @@ class ValidacaoTest(unittest.TestCase):
         # Comparar alguns componentes do grafo conhecidos
         comp_15 = frozenset({15, 18, 14})
         pureza_15 = 1.0
-        edges_15 = nx.OutEdgeView([(18, 15), (14, 18), (15, 18)])
+        edges_15 = [(18, 15), (14, 18), (15, 18)]
         self.assertEqual(comp_15, grafo.obter_componentes_contendo(15))
-        self.assertEqual()
+        self.assertEqual(pureza_15, grafo.pureza(15))
+        self.assertEqual(edges_15, list(grafo.grafo.subgraph(comp_15).edges()))
+
+    def test_grafo_otimo(self):
+        otimo = self.kaog.grafo_otimo
+        pureza_15 = 1.0
+        k_comp_15 = 3
+        vertices_pertencentes = [13, 43, 21, 11, 17, 1, 5, 32]
+
+        comp_15 = otimo.obter_componente_contendo(15)
+        for vertice in vertices_pertencentes:
+            with self.subTest(vertice=vertice):
+                self.assertIn(vertice, comp_15)
+        self.assertEqual(pureza_15, otimo.pureza(comp_15))
+        self.assertEqual(k_comp_15, otimo.obter_k_de_componente(comp_15))
 
 
 if __name__ == '__main__':

@@ -21,6 +21,14 @@ class GrafoOtimo(nx.DiGraph):
         return nx.algorithms.weakly_connected_components(self)
 
     def obter_k_de_componente(self, componente: frozenset[int]) -> int:
+        """
+        Obtém o valor de k do grafo associado do qual o componente foi obtido.
+
+        :param componente: Conjunto de vértices do componente.
+        :type componente: frozenset[int]
+        :return: Valor de k.
+        :rtype: int
+        """
         return self._componente_e_k[componente]
 
     def pureza(self, componente: frozenset[int]) -> float:
