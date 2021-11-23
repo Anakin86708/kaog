@@ -140,7 +140,7 @@ class KAssociado(DrawableGraph):
         """
         vizinhos: Dict[int, pd.Index] = {}
         for idx, row in self.x.iterrows():
-            vizinhos_ = self.distancias.k_vizinhos_mais_proximos_de(self.k, idx)
+            vizinhos_ = self.distancias.k_vizinhos_mais_proximos_de(idx, self.k)
             # Verificar as classes
             y_vizinhos = self.y[vizinhos_]
             # Manter apenas os vizinhos que pertençam a mesma classe

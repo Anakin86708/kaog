@@ -6,6 +6,7 @@ import pandas as pd
 
 from kaog import NOME_COLUNA_Y
 from kaog._grafo_otimo import GrafoOtimo
+from kaog.distancias import Distancias
 from kaog.k_associado import KAssociado
 from kaog.util.draw import DrawableGraph
 
@@ -23,22 +24,27 @@ class KAOG(DrawableGraph):
         self.grafos_associados: Dict[int, KAssociado] = {}
         self.componentes_otimos: Dict[frozenset[int], int] = {}  # Mapeia o valor de k do componente escolhido
         self._criar_kaog()
+        self._calcular_distancias_e_vizinhos()
 
     @property
-    def data(self):
+    def data(self) -> pd.DataFrame:
         return self._data.copy()
 
     @property
-    def x(self):
+    def x(self) -> pd.DataFrame:
         return self.data.drop(NOME_COLUNA_Y, axis=1)
 
     @property
-    def y(self):
+    def y(self) -> pd.Series:
         return self.data[NOME_COLUNA_Y]
 
     @property
     def grafo(self):
         return self.grafo_otimo
+
+    @property
+    def distancias_e_vizinhos(self):
+        return self._dist
 
     @property
     def componentes(self):
@@ -134,3 +140,9 @@ class KAOG(DrawableGraph):
         :type componente_k: nx.DiGraph
         """
         self.grafo_otimo.adicionar_componente_otimo(novo_componente=componente_k, k=k)
+
+    def _calcular_distancias_e_vizinhos(self):
+        """
+        Usado para calcular as distâncias e vizinhos entre os vértices do grafo ótimo.
+        """
+        self._dist = Distancias(self.x)

@@ -49,12 +49,22 @@ class DistanciasTest(unittest.TestCase):
             self.assertEqual(shape_, distancias.shape[1])
             self.assertEqual(k, distancias[:, :k].shape[1])
 
-    def test_vizinhos_mais_proximos_de(self):
+    def test_k_vizinhos_mais_proximos_de(self):
+        """Deve ter apenas os k-vizinhos mais próximos de um elemento."""
         k, x = self.k, self.x.copy()
         instance = Distancias(x)
 
-        proximos = instance.k_vizinhos_mais_proximos_de(k, 6)
+        proximos = instance.k_vizinhos_mais_proximos_de(6, k)
         expected = np.array([0, 1])
+        np.testing.assert_array_equal(expected, proximos)
+
+    def test_all_k_vizinhos_mais_proximos_de(self):
+        """Deve ter todos os vizinhos mais proximos de um elemento."""
+        k, x = self.k, self.x.copy()
+        instance = Distancias(x)
+
+        proximos = instance.k_vizinhos_mais_proximos_de(6)
+        expected = np.array([0, 1, 3, 4, 2, 5])
         np.testing.assert_array_equal(expected, proximos)
 
     def test_distancias_is_sorted(self):

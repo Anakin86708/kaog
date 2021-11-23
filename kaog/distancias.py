@@ -33,18 +33,20 @@ class Distancias:
     def rever_index_max(self):
         return {v: k for k, v in self.index_map.items()}
 
-    def k_vizinhos_mais_proximos_de(self, k: int, indice: int) -> np.ndarray:
+    def k_vizinhos_mais_proximos_de(self, indice: int, k: int = None) -> np.ndarray:
         """
         Com base no índice do pandas e fazendo uso do mapa de índices, retorna os k-vizinhos mais próximos de um
         determinado ponto.
 
-        :param k: Quantidade de vizinhos mais próximos.
-        :type k: int
         :param indice: Índice do pandas.
         :type indice: int
+        :param k: Quantidade de vizinhos mais próximos. Por padrão, retorna todos.
+        :type k: int
         :return: Índices dos vizinhos mais próximos.
         :rtype: numpy.ndarray
         """
+        if k is None:
+            k = self.x.shape[0] - 1
         numpy_indice_ = self.vizinhos[self.index_pandas_to_numpy(indice)][:k]
         return np.array(list(map(self.index_numpy_to_pandas, numpy_indice_)))
 
@@ -76,9 +78,23 @@ class Distancias:
 
         # Decrementa k para considerar o próprio ponto
         distances, kneighbors = nn.kneighbors(n_neighbors=k - 1, return_distance=True)
+        self._ordenar(distances, kneighbors)
+
+        return distances, kneighbors
+
+    @staticmethod
+    def _ordenar(distances, kneighbors):
+        """
+        Ordena os arrays de distâncias e vizinhos mais próximos, de forma que estejam ordenados de forma crescente pela
+        distância e em seguida ordenados pelos índices dos vizinhos.
+        Isso garante que se houver empate no valor da distância, será considerado a ordem dos índices dos vizinhos.
+
+        :param distances: Array com as distâncias entre os pontos.
+        :type distances: numpy.ndarray
+        :param kneighbors: Array com os índices dos vizinhos mais próximos.
+        :type kneighbors: numpy.ndarray
+        """
         for i, (d, k_) in enumerate(zip(distances, kneighbors)):
             sort_idx = np.lexsort((k_, d))
             distances[i] = d[sort_idx]
             kneighbors[i] = k_[sort_idx]
-
-        return distances, kneighbors
