@@ -23,40 +23,43 @@ class DistanciasTest(unittest.TestCase):
 
     def test_distancias(self):
         k, x = self.k, self.x
-        instance = Distancias(k, x)
+        instance = Distancias(x)
         self.assertIsInstance(instance, Distancias)
 
     def test_create_map_pandas_to_numpy(self):
         k, x = self.k, self.x.copy()
         x.set_index(np.random.randint(0, 255, size=x.shape[0]), inplace=True)
-        instance = Distancias(k, x)
+        instance = Distancias(x)
         map_idx = instance._create_map_pandas_to_numpy()
         for expected_idx, idx in enumerate(x.index):
             self.assertEqual(expected_idx, map_idx[idx])
 
     def test_calcular_distancias_e_vizinhos(self):
         k, x = self.k, self.x.copy()
-        instance = Distancias(k, x)
+        instance = Distancias(x)
 
+        shape_ = x.shape[0] - 1  # Desconsidera o próprio elemento
         for k in range(self.k, x.shape[0]):
             instance.k = k
             distancias, vizinhos = instance._calcular_distancias_e_vizinhos()
             self.assertEqual(x.shape[0], vizinhos.shape[0])
             self.assertEqual(x.shape[0], distancias.shape[0])
-            self.assertEqual(k, vizinhos.shape[1])
-            self.assertEqual(k, distancias.shape[1])
+            self.assertEqual(shape_, vizinhos.shape[1])
+            self.assertEqual(k, vizinhos[:, :k].shape[1])
+            self.assertEqual(shape_, distancias.shape[1])
+            self.assertEqual(k, distancias[:, :k].shape[1])
 
     def test_vizinhos_mais_proximos_de(self):
         k, x = self.k, self.x.copy()
-        instance = Distancias(k, x)
+        instance = Distancias(x)
 
-        proximos = instance.vizinhos_mais_proximos_de(6)
+        proximos = instance.k_vizinhos_mais_proximos_de(k, 6)
         expected = np.array([0, 1])
         np.testing.assert_array_equal(expected, proximos)
 
     def test_distancias_is_sorted(self):
         k, x = self.k, self.x.copy()
-        instance = Distancias(k, x)
+        instance = Distancias(x)
 
         distancias = instance.distancias
         self.assertTrue(np.all(np.diff(distancias) >= 0))
