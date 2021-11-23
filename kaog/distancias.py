@@ -91,15 +91,3 @@ class Distancias:
             kneighbors[i] = k[sort_idx]
 
         return distances, kneighbors
-
-    def _remover_distancia_vizinho_mesmo_ponto(self, k_, distances_, kneighbors_):
-        replace = -1
-        distances = np.zeros((k_, k_ - 1), dtype=float)
-        kneighbors = np.zeros((k_, k_ - 1), dtype=int)
-        for idx, line in enumerate(kneighbors_):
-            idx_buscado = np.where(line == idx)[0][0]  # Encontra o índice do ponto em questão.
-            line[idx_buscado] = replace
-            kneighbors[idx] = np.array(list(filter(lambda x: x != replace, line)))
-            distances_[idx][idx_buscado] = replace
-            distances[idx] = np.array(list(filter(lambda x: x != replace, distances_[idx])))
-        return distances, kneighbors

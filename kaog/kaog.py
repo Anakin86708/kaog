@@ -12,6 +12,12 @@ from kaog.util.draw import DrawableGraph
 
 class KAOG(DrawableGraph):
     def __init__(self, data: pd.DataFrame):
+        """
+        Cria um objeto do tipo KAOG. Todo o procedimento para criar o grafo ótimo é executado aqui.
+
+        :param data: Conjunto de dados do qual será criado o grafo ótimo.
+        :type data: pd.DataFrame
+        """
         self._data = data.copy()
 
         self.grafos_associados: Dict[int, KAssociado] = {}
