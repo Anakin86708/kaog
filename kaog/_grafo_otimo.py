@@ -2,6 +2,7 @@ from statistics import mean
 from typing import List, Dict, Set, Union
 
 import networkx as nx
+import numpy as np
 
 
 class GrafoOtimo(nx.DiGraph):
@@ -31,15 +32,15 @@ class GrafoOtimo(nx.DiGraph):
         """
         return self._componente_e_k[componente]
 
-    def pureza(self, componente: Union[int, frozenset[int]]) -> float:
+    def pureza(self, componente: Union[int, np.number, frozenset[int]]) -> float:
         """
         Calcula a pureza de determinado componente ótimo.
 
         :param componente: Deve pertencer aos componentes ótimos.
-        :type componente: Union[int,frozenset[int]]
+        :type componente: Union[int, np.number, frozenset[int]]
         :return: Valor da pureza
         """
-        if isinstance(componente, int):
+        if isinstance(componente, int) or isinstance(componente, np.number):
             return self.pureza(self.obter_componente_contendo(componente))
 
         k = self.obter_k_de_componente(componente)
