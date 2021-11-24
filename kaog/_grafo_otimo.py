@@ -31,13 +31,17 @@ class GrafoOtimo(nx.DiGraph):
         """
         return self._componente_e_k[componente]
 
-    def pureza(self, componente: frozenset[int]) -> float:
+    def pureza(self, componente: Union[int, frozenset[int]]) -> float:
         """
         Calcula a pureza de determinado componente ótimo.
 
         :param componente: Deve pertencer aos componentes ótimos.
+        :type componente: Union[int,frozenset[int]]
         :return: Valor da pureza
         """
+        if isinstance(componente, int):
+            return self.pureza(self.obter_componente_contendo(componente))
+
         k = self.obter_k_de_componente(componente)
         pureza = self._obter_media_grau_componente(componente) / (2 * k)
         if not 0 <= pureza <= 1:
