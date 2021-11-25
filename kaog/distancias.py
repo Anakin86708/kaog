@@ -50,6 +50,32 @@ class Distancias:
         numpy_indice_ = self.vizinhos[self.index_pandas_to_numpy(indice)][:k]
         return np.array(list(map(self.index_numpy_to_pandas, numpy_indice_)))
 
+    def distancias_de(self, indice: int) -> np.ndarray:
+        """
+        Retorna as distâncias de um ponto para todos os outros.
+
+        :param indice: Índice do pandas.
+        :type indice: int
+        :return: Array com as distâncias.
+        :rtype: numpy.ndarray
+        """
+        return self.distancias[self.index_pandas_to_numpy(indice)]
+
+    def distancia_entre(self, indice_1: int, indice_2: int) -> float:
+        """
+        Retorna a distância entre dois pontos.
+
+        :param indice_1: Índice do pandas.
+        :type indice_1: int
+        :param indice_2: Índice do pandas.
+        :type indice_2: int
+        :return: Distância entre os dois pontos.
+        :rtype: float
+        """
+        vizinhos_1 = self.k_vizinhos_mais_proximos_de(indice_1)
+        pos = np.where(vizinhos_1 == indice_2)[0][0]
+        return self.distancias_de(indice_1)[pos]
+
     def index_pandas_to_numpy(self, index: int) -> int:
         return self.index_map[index]
 

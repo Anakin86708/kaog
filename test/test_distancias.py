@@ -1,4 +1,5 @@
 import unittest
+from math import sqrt
 
 import numpy as np
 import pandas as pd
@@ -66,6 +67,14 @@ class DistanciasTest(unittest.TestCase):
         proximos = instance.k_vizinhos_mais_proximos_de(6)
         expected = np.array([0, 1, 3, 4, 2, 5])
         np.testing.assert_array_equal(expected, proximos)
+
+    def test_distancia_entre(self):
+        """Distância entre dois elementos, considerando a distância euclidiana."""
+        k, x = self.k, self.x.copy()
+        instance = Distancias(x)
+
+        distancia = instance.distancia_entre(0, 1)
+        self.assertEqual(sqrt(1), distancia)
 
     def test_distancias_is_sorted(self):
         k, x = self.k, self.x.copy()
