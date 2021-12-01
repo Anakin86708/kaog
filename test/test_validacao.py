@@ -51,16 +51,15 @@ class ValidacaoTest(unittest.TestCase):
 
         # Comparar alguns componentes do grafo conhecidos
         self.assertNotIn((43, 60), grafo.grafo.edges)
-        self.assertNotIn((43, 45), grafo.grafo.edges)
         self.assertIn((43, 23), grafo.grafo.edges)
         self.assertIn((43, 21), grafo.grafo.edges)
         self.assertIn((43, 26), grafo.grafo.edges)
-        self.assertLess(grafo.pureza(43), 1)
+        self.assertEqual(1, grafo.pureza(43))
 
     def test_grafo_otimo(self):
         otimo = self.kaog.grafo_otimo
         pureza_15 = 1.0
-        k_comp_15 = 3
+        k_comp_15 = 7
         vertices_pertencentes = [13, 43, 21, 11, 17, 1, 5, 32]
 
         comp_15 = otimo.obter_componente_contendo(15)
