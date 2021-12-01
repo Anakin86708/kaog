@@ -79,6 +79,19 @@ class KAssociado(DrawableGraph):
             raise RuntimeError(f'O valor da pureza do componente {componente} é {pureza}, fora do intervalo [1,0].')
         return pureza
 
+    def draw(self, title=None, color_by_component=False):
+        """
+        Desenha o grafo.
+
+        :param title: Título do gráfico.
+        :type title: str
+        :param color_by_component: Se deve colorir os vértices por componente ao invés das classes.
+        :type color_by_component: bool
+        """
+        if title is None:
+            title = f'{self.k}-associado'
+        super().draw(title=title, color_by_component=color_by_component)
+
     def _sanitize_pureza(self, componente: Union[int, Set[int], frozenset[int]]):
         """
         Com base no tipo do componente, retorna ao menos um vértice pertencente ao componente.

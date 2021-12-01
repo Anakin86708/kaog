@@ -50,6 +50,19 @@ class KAOG(DrawableGraph):
     def componentes(self):
         return self.grafo_otimo.componentes
 
+    def draw(self, title=None, color_by_component=False):
+        """
+        Desenha o grafo ótimo.
+
+        :param title: Título do gráfico.
+        :type title: str
+        :param color_by_component: Se True, desenha o grafo ótimo colorido por componentes.
+        :type color_by_component: bool
+        """
+        if title is None:
+            title = 'Grafo Ótimo'
+        super().draw(title=title, color_by_component=color_by_component)
+
     def _criar_kaog(self):
         k = 1
         self._iniciar_grafo_otimo()

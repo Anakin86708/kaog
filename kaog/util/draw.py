@@ -3,6 +3,7 @@ from itertools import cycle
 from random import shuffle
 
 import networkx as nx
+import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
@@ -39,7 +40,7 @@ class DrawableGraph(ABC):
     def y(self):
         raise NotImplementedError
 
-    def draw(self, color_by_component=False):
+    def draw(self, title=None, color_by_component=False):
         """
         Realiza o plot do grafo. Para dados em `self.x` que estejam em 2D, o plot é feito sem t-SNE, enquanto maiores
         dimensões são plotados com t-SNE.
@@ -49,8 +50,11 @@ class DrawableGraph(ABC):
         :type color_by_component: object
         """
         scala_fig = 2.5
+        scale_coords = 1
         fig = plt.figure(figsize=(6.4 * scala_fig, 4.8 * scala_fig))
         ax = fig.gca()
+        if title is not None:
+            ax.set_title(title)
         pos = nx.kamada_kawai_layout(self.grafo)
         markers = [*Line2D.markers.keys()][3:-4]
         y_unique = self.y.unique()
@@ -59,7 +63,7 @@ class DrawableGraph(ABC):
         scaller.fit(y_unique.reshape(-1, 1))
 
         # Obeter coordenadas utilizando t-SNE
-        cords = self._get_coords()
+        cords = self._get_coords(scale_coords)
 
         if color_by_component:
             self._draw_color_by_component(ax, cords)
@@ -105,7 +109,7 @@ class DrawableGraph(ABC):
             )
         plt.show()
 
-    def _get_coords(self):
+    def _get_coords(self, scale_coords=1):
         if self.x.shape[1] == 2:
             # 2D, não precisa de t-SNE
             cords = self.x.to_dict(orient='index')
@@ -117,5 +121,5 @@ class DrawableGraph(ABC):
 
         # Remover os dicionários internos e utilizar listas
         for k, v in cords.items():
-            cords[k] = [x for x in v.values()]
+            cords[k] = np.array([x for x in v.values()]) * scale_coords
         return cords

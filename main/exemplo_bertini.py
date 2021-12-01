@@ -18,8 +18,9 @@ kaog = KAOG(data)
 kaog.draw()
 
 # %%
-kaog.draw(True)
+kaog.draw(color_by_component=True)
 
 # %%
-kaog.grafos_associados[1].draw()
-kaog.grafos_associados[1].draw(True)
+for k in range(1, 7):
+    kaog.grafos_associados[k].draw()
+    kaog.grafos_associados[k].draw(color_by_component=True)

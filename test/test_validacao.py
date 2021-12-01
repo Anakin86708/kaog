@@ -35,6 +35,28 @@ class ValidacaoTest(unittest.TestCase):
         self.assertEqual(pureza_15, grafo.pureza(15))
         self.assertEqual(edges_15, list(grafo.grafo.subgraph(comp_15).edges()))
 
+    def test_k6(self):
+        k = 6
+        grafo = self.kaog.grafos_associados[k]
+        self.assertEqual(k, grafo.k)
+
+        # Comparar a distancia
+        dist = grafo.distancias
+        self.assertAlmostEqual(0.2, dist.distancia_entre(43, 26))
+        self.assertAlmostEqual(0.223607, dist.distancia_entre(43, 21), places=5)
+        self.assertLess(dist.distancia_entre(43, 23), dist.distancia_entre(43, 21))
+        self.assertLess(dist.distancia_entre(43, 26), dist.distancia_entre(43, 21))
+        self.assertLessEqual(dist.distancia_entre(43, 40), dist.distancia_entre(43, 60))
+        self.assertLessEqual(dist.distancia_entre(43, 45), dist.distancia_entre(43, 60))
+
+        # Comparar alguns componentes do grafo conhecidos
+        self.assertNotIn((43, 60), grafo.grafo.edges)
+        self.assertNotIn((43, 45), grafo.grafo.edges)
+        self.assertIn((43, 23), grafo.grafo.edges)
+        self.assertIn((43, 21), grafo.grafo.edges)
+        self.assertIn((43, 26), grafo.grafo.edges)
+        self.assertLess(grafo.pureza(43), 1)
+
     def test_grafo_otimo(self):
         otimo = self.kaog.grafo_otimo
         pureza_15 = 1.0
