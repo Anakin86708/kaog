@@ -14,8 +14,7 @@ from kaog.util.draw import DrawableGraph
 class KAOG(DrawableGraph):
     """Algoritmo para criar o grafo otimo de um conjunto de dados.
 
-    KAOG
-    ====
+    **KAOG**
 
     A partir do conjunto de dados forneido, é executado o algoritmo para criar o grafo ótimo.
 

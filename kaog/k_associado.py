@@ -1,4 +1,3 @@
-from functools import cached_property
 from statistics import mean
 from typing import Dict, Set, Union, List
 
@@ -13,8 +12,7 @@ from kaog.util.draw import DrawableGraph
 class KAssociado(DrawableGraph):
     """Representação de um grafo k-associado.
 
-    KAssociado
-    ==========
+    **KAssociado**
 
     Grafo k-associado é um grafo que possui um número máximo de k ligações originando de cada vértice. Essa ligação é
     feita considerando os vértices mais próximos e a conexão só é feita se a classe dos dois vértices for igual.
@@ -56,12 +54,12 @@ class KAssociado(DrawableGraph):
         """Conjunto de dados, com classe associada."""
         return self._data.copy()
 
-    @cached_property
+    @property
     def x(self) -> pd.DataFrame:
         """Dados sem classe associada."""
         return self.data.drop(NOME_COLUNA_Y, axis=1)
 
-    @cached_property
+    @property
     def y(self) -> pd.Series:
         """Classe de cada vértice."""
         return self.data[NOME_COLUNA_Y]
@@ -132,6 +130,7 @@ class KAssociado(DrawableGraph):
         else:
             raise TypeError(f'O argumento `componente` deve ser int, Set[int] ou frozenset[int].')
         return vertice_pertencente
+
     # noinspection PyTypeChecker
 
     def media_grau_componentes(self) -> float:
@@ -183,6 +182,7 @@ class KAssociado(DrawableGraph):
             vizinhos_ = y_vizinhos.where(y_vizinhos == self.y[idx]).dropna().index
             vizinhos[idx] = vizinhos_
         return vizinhos
+
     # noinspection PyTypeChecker
 
     def _obter_media_grau_componente(self, componente: Union[Set[int], frozenset[int]]) -> float:

@@ -16,8 +16,7 @@ from kaog.util import NOME_COLUNA_Y
 class DrawableGraph(ABC):
     """Adiciona métodos para desenhar grafos.
 
-    DrawableGraph
-    =============
+    **DrawableGraph**
 
     Classe abstrata que adiciona a possibilidade de desenhar grafos.
     """

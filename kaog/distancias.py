@@ -8,13 +8,11 @@ from sklearn.neighbors import NearestNeighbors
 class Distancias:
     """Cálculo de distancias entre pontos e os vizinhos mais próximos.
 
-    Distancias
-    ==========
+    **Distancias**
 
     Método de cálculo de distâncias entre pontos por meio da métrica definida em `METRIC`.
 
-    Atributos
-    ---------
+    **Atributos**
     METRIC
         Métrica de cálculo de distâncias. Pode ser definida como uma função ou como um nome de métrica reconhecida pelo
         NearestNeighbors.
