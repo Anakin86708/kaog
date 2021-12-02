@@ -1,14 +1,11 @@
-kaog
-====
+﻿kaog
+===============
 
 .. automodule:: kaog
+   :show-inheritance:
    :members:
    :undoc-members:
-   :show-inheritance:
    :private-members:
-   
-   
-   
 
    
    
@@ -22,5 +19,21 @@ kaog
    
    
 
+   
+   
+   
 
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   kaog.distancias
+   kaog.grafo_otimo
+   kaog.k_associado
+   kaog.kaog
+   kaog.util
 

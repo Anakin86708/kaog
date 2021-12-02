@@ -1,17 +1,6 @@
 Welcome to KAOG's documentation!
 ================================
 
-.. autosummary::
-   :toctree: modules
-
-   kaog
-   kaog.util
-   kaog.util.draw
-   kaog._grafo_otimo
-   kaog.distancias
-   kaog.k_associado
-   kaog.kaog
-
 
 Indices and tables
 ==================
@@ -20,7 +9,30 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+
 Modules
 =======
+
+.. autosummary::
+   :toctree: modules
+   :recursive:
+
+   kaog
+   kaog.util
+   kaog.util.draw
+   #kaog.util.draw.DrawableGraph
+   kaog.grafo_otimo
+   #kaog.grafo_otimo.GrafoOtimo
+   kaog.distancias
+   #kaog.distancias.Distancias
+   kaog.k_associado
+   #kaog.k_associado.KAssociado
+   kaog.kaog
+   #kaog.kaog.KAOG
+
+
+
+
+
 
 

@@ -2,10 +2,7 @@ kaog.util
 =========
 
 .. automodule:: kaog.util
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:
+
    
    
    
@@ -23,4 +20,12 @@ kaog.util
    
 
 
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   kaog.util.draw
 

@@ -4,8 +4,8 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
-from kaog._grafo_otimo import GrafoOtimo
 from kaog.distancias import Distancias
+from kaog.grafo_otimo import GrafoOtimo
 from kaog.k_associado import KAssociado
 from kaog.util import NOME_COLUNA_Y
 from kaog.util.draw import DrawableGraph

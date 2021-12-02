@@ -1,7 +1,7 @@
-kaog.util.draw
-==============
+kaog.grafo\_otimo
+=================
 
-.. automodule:: kaog.util.draw
+.. automodule:: kaog.grafo_otimo
 
    
    
@@ -17,7 +17,7 @@ kaog.util.draw
 
    .. autosummary::
    
-      DrawableGraph
+      GrafoOtimo
    
    
 
