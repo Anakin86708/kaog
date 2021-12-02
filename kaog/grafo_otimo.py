@@ -8,8 +8,8 @@ import numpy as np
 class GrafoOtimo(nx.DiGraph):
     """Representação de um grafo otimo.
 
-    GrafoOtimo
-    ==========
+    **GrafoOtimo**
+
 
     Adciona as propriedades e funcionalidades necessárias para o cálculo e representação de um grafo otimo.
     Contém os componentes, bem como a associação entre o componente e seu valor de k.

@@ -13,8 +13,7 @@ from kaog.util.draw import DrawableGraph
 class KAssociado(DrawableGraph):
     """Representação de um grafo k-associado.
 
-    KAssociado
-    ==========
+    **KAssociado**
 
     Grafo k-associado é um grafo que possui um número máximo de k ligações originando de cada vértice. Essa ligação é
     feita considerando os vértices mais próximos e a conexão só é feita se a classe dos dois vértices for igual.
