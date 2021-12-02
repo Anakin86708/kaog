@@ -9,6 +9,4 @@ Desenvolvido para o projeto de Iniciação Científica.
 """
 __author__ = 'Ariel Tadeu da Silva'
 
-NOME_COLUNA_Y = 'target'
-
 from .kaog import KAOG, KAssociado

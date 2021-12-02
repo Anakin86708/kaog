@@ -10,7 +10,7 @@ from matplotlib.lines import Line2D
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import MinMaxScaler
 
-from kaog import NOME_COLUNA_Y
+from kaog.util import NOME_COLUNA_Y
 
 
 class DrawableGraph(ABC):

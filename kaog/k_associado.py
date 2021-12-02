@@ -5,8 +5,8 @@ from typing import Dict, Set, Union, List
 import networkx as nx
 import pandas as pd
 
-from kaog import NOME_COLUNA_Y
 from kaog.distancias import Distancias
+from kaog.util import NOME_COLUNA_Y
 from kaog.util.draw import DrawableGraph
 
 

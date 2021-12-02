@@ -5,4 +5,3 @@ sklearn~=0.0
 scikit-learn~=1.0.1
 numpy~=1.21.4
 setuptools~=57.0.0
-distython~=0.0.3

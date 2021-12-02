@@ -2,7 +2,8 @@ import unittest
 
 import pandas as pd
 
-from kaog import KAOG, KAssociado, NOME_COLUNA_Y
+from kaog import KAOG, KAssociado
+from kaog.util import NOME_COLUNA_Y
 
 
 class KAOGTest(unittest.TestCase):
