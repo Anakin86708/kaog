@@ -6,7 +6,28 @@ import numpy as np
 
 
 class GrafoOtimo(nx.DiGraph):
+    """Representação de um grafo otimo.
+
+    GrafoOtimo
+    ==========
+
+    Adciona as propriedades e funcionalidades necessárias para o cálculo e representação de um grafo otimo.
+    Contém os componentes, bem como a associação entre o componente e seu valor de k.
+    """
+
     def __init__(self, nodes, edges, **attr):
+        """
+        Para iniciar o grafo ótimo, são necessários os vértices e arestas, sendo uma lista de inteiros, por exemplo,
+        para representar os vértices, e uma lista de tuplas de inteiros, por exemplo, para representar as arestas.
+
+        **OBS:** O grafo inicial é considerado com seus componentes sendo tirados de um grafo **1-associado**.
+
+        :param nodes: Lista de vértices.
+        :type nodes: List[int]
+        :param edges: Lista de arestas.
+        :type edges: List[Tuple[int, int]]
+        :param attr: Atributos adicionais sendo passados para a classe pai *nx.DiGraph*.
+        """
         super().__init__(**attr)
         self.add_nodes_from(nodes)
         self.add_edges_from(edges)
@@ -15,11 +36,8 @@ class GrafoOtimo(nx.DiGraph):
 
     @property
     def componentes(self) -> List[frozenset[int]]:
+        """Lista de componentes do grafo."""
         return list(map(frozenset, self._gen_componentes()))
-
-    def _gen_componentes(self):
-        """Gerador para os componentes do grafo."""
-        return nx.algorithms.weakly_connected_components(self)
 
     def obter_k_de_componente(self, componente: frozenset[int]) -> int:
         """
@@ -35,10 +53,13 @@ class GrafoOtimo(nx.DiGraph):
     def pureza(self, componente: Union[int, np.number, frozenset[int]]) -> float:
         """
         Calcula a pureza de determinado componente ótimo.
+        Pode ser passado um vértice pertencente ao componente ou um conjunto de vértices que representa o componente.
 
         :param componente: Deve pertencer aos componentes ótimos.
         :type componente: Union[int, np.number, frozenset[int]]
         :return: Valor da pureza
+        :rtype: float
+        :raises ValueError: Se o vértice não pertencer ao grafo.
         """
         if isinstance(componente, int) or isinstance(componente, np.number):
             return self.pureza(self.obter_componente_contendo(componente))
@@ -57,6 +78,7 @@ class GrafoOtimo(nx.DiGraph):
         :type vertice: int
         :return: Componente conectado ao vértice.
         :rtype: frozenset[int]
+        :raises ValueError: Se o vértice não pertencer ao grafo.
         """
         for comp in self._gen_componentes():
             if vertice in comp:
@@ -69,8 +91,9 @@ class GrafoOtimo(nx.DiGraph):
         anteriores e a associação do valor de k.
 
         :param novo_componente: Subgrafo indicando aquele componente ótimo.
+        :type novo_componente: nx.DiGraph
         :param k: Valor de k do qual o componente foi tirado.
-        :return:
+        :type k: int
         """
         # Iterar todos os componentes ótimos e remover os que estão no novo componente
         novo_componente_ = frozenset(list(nx.algorithms.weakly_connected_components(novo_componente))[0])
@@ -86,9 +109,12 @@ class GrafoOtimo(nx.DiGraph):
         self._componente_e_k[novo_componente_] = k
 
         # Atualizar o grafo ótimo
-        # self.remove_edges_from(self.subgraph(novo_componente_).edges)
         self.add_nodes_from(novo_componente.nodes)
         self.add_edges_from(novo_componente.edges)
+
+    def _gen_componentes(self):
+        """Gerador para os componentes do grafo."""
+        return nx.algorithms.weakly_connected_components(self)
 
     def _obter_media_grau_componente(self, componente: Union[Set[int], frozenset[int]]) -> float:
         """

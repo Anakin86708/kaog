@@ -11,10 +11,20 @@ from kaog.util.draw import DrawableGraph
 
 
 class KAssociado(DrawableGraph):
+    """Representação de um grafo k-associado.
+
+    KAssociado
+    ==========
+
+    Grafo k-associado é um grafo que possui um número máximo de k ligações originando de cada vértice. Essa ligação é
+    feita considerando os vértices mais próximos e a conexão só é feita se a classe dos dois vértices for igual.
+    Sendo assim, para as distâncias, não importa as classes dos vértices. A classe só é utilizada para a conexão.
+    """
 
     def __init__(self, k: int, data: pd.DataFrame):
         """
-        Cada instância de `data` é representada como um vértice, que será conectado a todos seus `k` vizinhos mais próximos que pertencerem a mesma classe.
+        Cada instância de `data` é representada como um vértice, que será conectado a todos seus `k` vizinhos mais
+        próximos, se pertencerem a mesma classe.
         Diferente do KNN, o grafo K-associado só permite conexões de mesma classe e conexões múltiplas são mantidas.
 
         :param k: Quantidade máxima de conexões dos vértices.
@@ -33,32 +43,38 @@ class KAssociado(DrawableGraph):
 
     @property
     def grafo(self):
+        """Grafo k-associado gerado."""
         return self._grafo
 
     @property
     def k(self):
+        """Valor de k do grafo em questão."""
         return self._k
 
     @property
     def data(self) -> pd.DataFrame:
+        """Conjunto de dados, com classe associada."""
         return self._data.copy()
 
     @cached_property
     def x(self) -> pd.DataFrame:
+        """Dados sem classe associada."""
         return self.data.drop(NOME_COLUNA_Y, axis=1)
 
     @cached_property
     def y(self) -> pd.Series:
+        """Classe de cada vértice."""
         return self.data[NOME_COLUNA_Y]
 
     @property
     def componentes(self) -> List[frozenset[int]]:
+        """Componentes do grafo."""
         return list(map(frozenset, self._gen_componentes()))
 
-    def _gen_componentes(self):
-        """Gerador para os componentes do grafo."""
-        return nx.algorithms.weakly_connected_components(self.grafo)
-
+    @staticmethod
+    def _create_edgelist(vizinhos):
+        """Cria a lista de arestas do grafo, considerando os vizinhos."""
+        return [(x, y) for x in vizinhos for y in vizinhos[x]]
 
     def pureza(self, componente: Union[int, Set[int], frozenset[int]]) -> float:
         """
@@ -81,7 +97,7 @@ class KAssociado(DrawableGraph):
 
     def draw(self, title=None, color_by_component=False):
         """
-        Desenha o grafo.
+        Desenha o grafo. Por padrão, a cor de cada vértice é a sua classe.
 
         :param title: Título do gráfico.
         :type title: str
@@ -92,6 +108,10 @@ class KAssociado(DrawableGraph):
             title = f'{self.k}-associado'
         super().draw(title=title, color_by_component=color_by_component)
 
+    def _gen_componentes(self):
+        """Gerador para os componentes do grafo."""
+        return nx.algorithms.weakly_connected_components(self.grafo)
+
     def _sanitize_pureza(self, componente: Union[int, Set[int], frozenset[int]]):
         """
         Com base no tipo do componente, retorna ao menos um vértice pertencente ao componente.
@@ -100,6 +120,8 @@ class KAssociado(DrawableGraph):
         :type componente: Union[int, Set[int]]
         :return: Vértice pertencente ao componente.
         :rtype: int
+        :raises ValueError: Se o componente ou vértice não pertence ao grafo.
+        :raises TypeError: Se o tipo do argumento `componente` não for int, Set[int] ou frozenset[int].
         """
         if isinstance(componente, set) or isinstance(componente, frozenset):
             if componente not in self.componentes:
@@ -110,8 +132,8 @@ class KAssociado(DrawableGraph):
         else:
             raise TypeError(f'O argumento `componente` deve ser int, Set[int] ou frozenset[int].')
         return vertice_pertencente
-
     # noinspection PyTypeChecker
+
     def media_grau_componentes(self) -> float:
         """
         Calcula a média do grau de **todos** os componentes contidos no grafo.
@@ -142,6 +164,7 @@ class KAssociado(DrawableGraph):
         raise ValueError(f'O vértice {vertice} não pertence a nenhum componente.')
 
     def adicionar_arestas(self, novas_arestas):
+        """Adiciona as arestas ao grafo."""
         self.grafo.add_edges_from(novas_arestas)
 
     def _determinar_vizinhos(self) -> Dict[int, pd.Index]:
@@ -160,8 +183,8 @@ class KAssociado(DrawableGraph):
             vizinhos_ = y_vizinhos.where(y_vizinhos == self.y[idx]).dropna().index
             vizinhos[idx] = vizinhos_
         return vizinhos
-
     # noinspection PyTypeChecker
+
     def _obter_media_grau_componente(self, componente: Union[Set[int], frozenset[int]]) -> float:
         """
         Obtém a média do grau dos vértices do componente conectado ao vértice.
@@ -175,11 +198,8 @@ class KAssociado(DrawableGraph):
         graus = [self.grafo.degree(i) for i in componente]
         return mean(graus)
 
-    @staticmethod
-    def _create_edgelist(vizinhos):
-        return [(x, y) for x in vizinhos for y in vizinhos[x]]
-
     def _criar_grafo(self):
+        """Cria o grafo a partir dos dados do dataset e a lista de arestas."""
         graph = nx.DiGraph()
         graph.add_nodes_from(self.x.index)
         graph.add_edges_from(self._edgelist)
