@@ -10,34 +10,45 @@ from matplotlib.lines import Line2D
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import MinMaxScaler
 
-from kaog import NOME_COLUNA_Y
+from kaog.util import NOME_COLUNA_Y
 
 
 class DrawableGraph(ABC):
+    """Adiciona métodos para desenhar grafos.
+
+    **DrawableGraph**
+
+    Classe abstrata que adiciona a possibilidade de desenhar grafos.
+    """
 
     @property
     @abstractmethod
-    def grafo(self):
+    def grafo(self) -> nx.DiGraph:
+        """Representação do grafo."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def componentes(self):
+        """Componentes pertencentes ao grafo."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def data(self):
+        """Dados do grafo, com informação de classes."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def x(self):
+        """Dados do grafo, sem classes."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def y(self):
+        """Classe associada aos dados do grafo."""
         raise NotImplementedError
 
     def draw(self, title=None, color_by_component=False):
@@ -71,6 +82,7 @@ class DrawableGraph(ABC):
             self._draw_color_by_class(ax, cords, replace, scaller, y_unique)
 
     def _draw_color_by_component(self, ax, cords):
+        """Colorir os vértices de acordo com o componente conectado ao vértice."""
         colors = list(range(len(self.componentes)))
         shuffle(colors)
         for i, componente in zip(colors, self.componentes):
@@ -90,6 +102,7 @@ class DrawableGraph(ABC):
         plt.show()
 
     def _draw_color_by_class(self, ax, cords, replace, scaller, y_unique):
+        """Colorir os vértices de acordo com a classe."""
         # Iterar os vértices de cada classe
         for i, classe in enumerate(y_unique):
             vertices = self.data[self.data[NOME_COLUNA_Y] == classe].index
@@ -110,6 +123,7 @@ class DrawableGraph(ABC):
         plt.show()
 
     def _get_coords(self, scale_coords=1):
+        """Obter coordenadas utilizando t-SNE, se necessário."""
         if self.x.shape[1] == 2:
             # 2D, não precisa de t-SNE
             cords = self.x.to_dict(orient='index')

@@ -1,4 +1,3 @@
-from functools import cached_property
 from typing import Dict
 
 import numpy as np
@@ -7,11 +6,23 @@ from sklearn.neighbors import NearestNeighbors
 
 
 class Distancias:
+    """Cálculo de distancias entre pontos e os vizinhos mais próximos.
+
+    **Distancias**
+
+    Método de cálculo de distâncias entre pontos por meio da métrica definida em `METRIC`.
+
+    **Atributos**
+    METRIC
+        Métrica de cálculo de distâncias. Pode ser definida como uma função ou como um nome de métrica reconhecida pelo
+        NearestNeighbors.
+
+    """
     METRIC = 'euclidean'
 
     def __init__(self, x: pd.DataFrame):
         """
-        Calcula as distâncias e vizinhos mais próximos de cada ponto utilizando a métrica da classe.
+        Recebe o DataFrame com os pontos que serão calculadas as distâncias.
 
         :param x: Dados de entrada, sem informação de classes.
         :type x: pandas.DataFrame
@@ -22,6 +33,7 @@ class Distancias:
 
     @property
     def distancias(self):
+        """Array com as distâncias entre os pontos."""
         return self._distancias
 
     @property
@@ -29,8 +41,9 @@ class Distancias:
         """Apenas os índices para os vizinhos, **sem considerar** as informações de classes!"""
         return self._vizinhos
 
-    @cached_property
+    @property
     def rever_index_max(self):
+        """Possibilita a conversão de índice da matriz para índice do DataFrame."""
         return {v: k for k, v in self.index_map.items()}
 
     def k_vizinhos_mais_proximos_de(self, indice: int, k: int = None) -> np.ndarray:
@@ -77,14 +90,17 @@ class Distancias:
         return self.distancias_de(indice_1)[pos]
 
     def index_pandas_to_numpy(self, index: int) -> int:
+        """Converte o índice do pandas para o índice da matriz."""
         return self.index_map[index]
 
     def index_numpy_to_pandas(self, index: int) -> int:
+        """Converte o índice da matriz para o índice do pandas."""
         return self.rever_index_max[index]
 
     def _create_map_pandas_to_numpy(self) -> Dict[int, int]:
         """
         Mapear cada índice da coluna do DataFrame para um número inteiro respectivo a linha da matriz.
+
         :return: Dicionário com o índice do DataFrame como chave e o índice da matriz como valor.
         :rtype: Dict[int, int]
         """

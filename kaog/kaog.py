@@ -4,19 +4,27 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
-from kaog import NOME_COLUNA_Y
-from kaog._grafo_otimo import GrafoOtimo
 from kaog.distancias import Distancias
+from kaog.grafo_otimo import GrafoOtimo
 from kaog.k_associado import KAssociado
+from kaog.util import NOME_COLUNA_Y
 from kaog.util.draw import DrawableGraph
 
 
 class KAOG(DrawableGraph):
+    """Algoritmo para criar o grafo otimo de um conjunto de dados.
+
+    **KAOG**
+
+    A partir do conjunto de dados forneido, é executado o algoritmo para criar o grafo ótimo.
+
+    """
+
     def __init__(self, data: pd.DataFrame):
         """
         Cria um objeto do tipo KAOG. Todo o procedimento para criar o grafo ótimo é executado aqui.
 
-        :param data: Conjunto de dados do qual será criado o grafo ótimo.
+        :param data: Conjunto de dados contendo também informação de classe, do qual será criado o grafo ótimo.
         :type data: pd.DataFrame
         """
         self._data = data.copy()
@@ -28,26 +36,32 @@ class KAOG(DrawableGraph):
 
     @property
     def data(self) -> pd.DataFrame:
+        """Conjunto de dados."""
         return self._data.copy()
 
     @property
     def x(self) -> pd.DataFrame:
+        """Dados sem a classe."""
         return self.data.drop(NOME_COLUNA_Y, axis=1)
 
     @property
     def y(self) -> pd.Series:
+        """Informação de classe."""
         return self.data[NOME_COLUNA_Y]
 
     @property
     def grafo(self):
+        """Grafo ótimo."""
         return self.grafo_otimo
 
     @property
     def distancias_e_vizinhos(self):
+        """Objeto com as respectivas distâncias e vizinhos."""
         return self._dist
 
     @property
     def componentes(self):
+        """Componentes do grafo ótimo."""
         return self.grafo_otimo.componentes
 
     def draw(self, title=None, color_by_component=False):
@@ -64,6 +78,16 @@ class KAOG(DrawableGraph):
         super().draw(title=title, color_by_component=color_by_component)
 
     def _criar_kaog(self):
+        """Algoritmo central para criar o KAOG.
+
+        Inicialmente, o grafo ótimo é criado como um grafo 1-associado.
+        Em seguida, é calculada a taxa para esse grafo e incrementado o valor de k.
+        Com o novo k-associao, é iterado cada um de seus componentes e analisado se esse união dos componentes que
+        anteriormente estavam no grafo ótimo resultou em uma pureza maior ou igual a de cada componente ótimo que foi
+        unido nesse novo componente.
+        Caso tenha sido, o novo componente é adicionado ao grafo ótimo.
+        Ao final, é calculada a taxa para verificar se o algoritmo terminou.
+        """
         k = 1
         self._iniciar_grafo_otimo()
         while 1:
@@ -84,7 +108,7 @@ class KAOG(DrawableGraph):
 
     def _calcular_pureza_componentes_otimos(self, componentes_otimo: List[frozenset[int]]) -> np.ndarray:
         """
-        Calcula a pureza de cada um dos componentes ótimos.
+        Calcula a pureza de *todos** os componentes ótimos.
 
         :param componentes_otimo: Componentes pertencentes ao grafo ótimo.
         :type componentes_otimo: List[frozenset[int]]
@@ -155,7 +179,5 @@ class KAOG(DrawableGraph):
         self.grafo_otimo.adicionar_componente_otimo(novo_componente=componente_k, k=k)
 
     def _calcular_distancias_e_vizinhos(self):
-        """
-        Usado para calcular as distâncias e vizinhos entre os vértices do grafo ótimo.
-        """
+        """Calcula as distâncias e vizinhos entre os vértices do grafo ótimo."""
         self._dist = Distancias(self.x)
