@@ -64,6 +64,7 @@ class DrawableGraph(ABC):
         scale_coords = 1
         fig = plt.figure(figsize=(6.4 * scala_fig, 4.8 * scala_fig))
         ax = fig.gca()
+        ax.set_aspect('equal')
         if title is not None:
             ax.set_title(title)
         pos = nx.kamada_kawai_layout(self.grafo)
