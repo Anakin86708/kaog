@@ -64,6 +64,10 @@ class KAOG(DrawableGraph):
         """Componentes do grafo ótimo."""
         return self.grafo_otimo.componentes
 
+    @staticmethod
+    def set_metrica_distancia(metrica):
+        Distancias.METRIC = metrica
+
     def draw(self, title=None, color_by_component=False):
         """
         Desenha o grafo ótimo.

@@ -1,3 +1,4 @@
+import logging
 from typing import Dict
 
 import numpy as np
@@ -114,14 +115,15 @@ class Distancias:
         :return: Array de distâncias e array com os vizinhos mais próximos.
         :rtype: Tuple[numpy.ndarray, numpy.ndarray]
         """
-        # TODO: implementar o HEOM
         k = self.x.shape[0]
-        nn = NearestNeighbors(n_neighbors=k, metric=self.METRIC, n_jobs=-1, algorithm='ball_tree').fit(self.x)
+        logging.debug('Calculando distâncias e vizinhos...')
+        nn = NearestNeighbors(n_neighbors=k, metric=self.METRIC, n_jobs=1, algorithm='ball_tree').fit(self.x)
 
         # Decrementa k para considerar o próprio ponto
         distances, kneighbors = nn.kneighbors(n_neighbors=k - 1, return_distance=True)
+        logging.debug('Distâncias calculadas.')
         self._ordenar(distances, kneighbors)
-
+        logging.debug('Distâncias ordenadas.')
         return distances, kneighbors
 
     @staticmethod
