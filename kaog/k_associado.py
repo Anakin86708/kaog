@@ -19,7 +19,7 @@ class KAssociado(DrawableGraph):
     Sendo assim, para as distâncias, não importa as classes dos vértices. A classe só é utilizada para a conexão.
     """
 
-    def __init__(self, k: int, data: pd.DataFrame):
+    def __init__(self, k: int, data: pd.DataFrame, colunas_categoricas: pd.Index = pd.Index([])):
         """
         Cada instância de `data` é representada como um vértice, que será conectado a todos seus `k` vizinhos mais
         próximos, se pertencerem a mesma classe.
@@ -32,7 +32,7 @@ class KAssociado(DrawableGraph):
         """
         self._k = k
         self._data: pd.DataFrame = data.copy()
-        self.distancias = Distancias(self.x)
+        self.distancias = Distancias(self.x, colunas_categoricas)
 
         vizinhos = self._determinar_vizinhos()
 

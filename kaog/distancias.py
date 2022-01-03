@@ -21,7 +21,7 @@ class Distancias:
     """
     METRIC = 'euclidean'
 
-    def __init__(self, x: pd.DataFrame):
+    def __init__(self, x: pd.DataFrame, colunas_categoricas: pd.Index = pd.Index([])):
         """
         Recebe o DataFrame com os pontos que serão calculadas as distâncias.
 
@@ -29,6 +29,7 @@ class Distancias:
         :type x: pandas.DataFrame
         """
         self.x = x.copy()
+        self.cat_cols = colunas_categoricas.copy()
         self.index_map = self._create_map_pandas_to_numpy()
         self._distancias, self._vizinhos = self._calcular_distancias_e_vizinhos()
 
@@ -117,14 +118,30 @@ class Distancias:
         """
         k = self.x.shape[0]
         logging.debug('Calculando distâncias e vizinhos...')
-        nn = NearestNeighbors(n_neighbors=k, metric=self.METRIC, n_jobs=1, algorithm='ball_tree').fit(self.x)
+        x = self._categoricos_para_numericos(self.x)
+        nn = NearestNeighbors(n_neighbors=k, metric=self.METRIC, n_jobs=-1).fit(x)
 
         # Decrementa k para considerar o próprio ponto
         distances, kneighbors = nn.kneighbors(n_neighbors=k - 1, return_distance=True)
         logging.debug('Distâncias calculadas.')
         self._ordenar(distances, kneighbors)
-        logging.debug('Distâncias ordenadas.')
         return distances, kneighbors
+
+    def _categoricos_para_numericos(self, x: pd.DataFrame):
+        """
+        Converte os valores que estão em colunas categóricas para valores numéricos, permitindo que seja aplicada a
+        distância.
+
+        :param x: Conjunto de dados, sem informação de classes.
+        :type x: pandas.DataFrame
+        :return: Conjunto de dados, com valores numéricos.
+        :rtype: pandas.DataFrame
+        """
+        x = x.copy()
+        for col in self.cat_cols:
+            x[col] = pd.factorize(x[col])[0] + 1
+
+        return x
 
     @staticmethod
     def _ordenar(distances, kneighbors):

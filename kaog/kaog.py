@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, List
 
 import networkx as nx
@@ -20,7 +21,7 @@ class KAOG(DrawableGraph):
 
     """
 
-    def __init__(self, data: pd.DataFrame):
+    def __init__(self, data: pd.DataFrame, colunas_categoricas: pd.Index = pd.Index([])):
         """
         Cria um objeto do tipo KAOG. Todo o procedimento para criar o grafo ótimo é executado aqui.
 
@@ -28,6 +29,7 @@ class KAOG(DrawableGraph):
         :type data: pd.DataFrame
         """
         self._data = data.copy()
+        self.cat_cols = colunas_categoricas.copy()
 
         self.grafos_associados: Dict[int, KAssociado] = {}
         self.componentes_otimos: Dict[frozenset[int], int] = {}  # Mapeia o valor de k do componente escolhido
@@ -156,7 +158,8 @@ class KAOG(DrawableGraph):
         :type k: int
         :return: Novo grafo k-associado.
         """
-        k_associado = KAssociado(k, self.data)
+        logging.debug('Criando grafo k-associado com k={}'.format(k))
+        k_associado = KAssociado(k, self.data, self.cat_cols)
         self.grafos_associados[k] = k_associado
         return k_associado
 
@@ -184,4 +187,4 @@ class KAOG(DrawableGraph):
 
     def _calcular_distancias_e_vizinhos(self):
         """Calcula as distâncias e vizinhos entre os vértices do grafo ótimo."""
-        self._dist = Distancias(self.x)
+        self._dist = Distancias(self.x, self.cat_cols)
