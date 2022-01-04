@@ -1,5 +1,6 @@
 import logging
-from typing import Dict
+from concurrent.futures import ThreadPoolExecutor
+from typing import Dict, Callable, Union
 
 import numpy as np
 import pandas as pd
@@ -19,7 +20,7 @@ class Distancias:
         NearestNeighbors.
 
     """
-    METRIC = 'euclidean'
+    METRIC: Union[str, Callable] = 'euclidean'
 
     def __init__(self, x: pd.DataFrame, colunas_categoricas: pd.Index = pd.Index([])):
         """
@@ -117,9 +118,10 @@ class Distancias:
         :rtype: Tuple[numpy.ndarray, numpy.ndarray]
         """
         k = self.x.shape[0]
-        logging.debug('Calculando distâncias e vizinhos...')
         x = self._categoricos_para_numericos(self.x)
-        nn = NearestNeighbors(n_neighbors=k, metric=self.METRIC, n_jobs=-1).fit(x)
+        logging.debug('Calculando distâncias e vizinhos...')
+        distances = self._computar_distancias(x)
+        nn = NearestNeighbors(n_neighbors=k, metric=self.METRIC, n_jobs=1, algorithm='ball_tree').fit(x)
 
         # Decrementa k para considerar o próprio ponto
         distances, kneighbors = nn.kneighbors(n_neighbors=k - 1, return_distance=True)
@@ -138,9 +140,11 @@ class Distancias:
         :rtype: pandas.DataFrame
         """
         x = x.copy()
+        logging.debug('Realizando factorize dos dados...')
         for col in self.cat_cols:
             x[col] = pd.factorize(x[col])[0] + 1
 
+        logging.debug('Dados convertidos.')
         return x
 
     @staticmethod
@@ -159,3 +163,28 @@ class Distancias:
             sort_idx = np.lexsort((k_, d))
             distances[i] = d[sort_idx]
             kneighbors[i] = k_[sort_idx]
+
+    def _computar_distancias(self, x):
+
+        def computar_distancias_da_linha(distances, i, range_, x):
+            for j in range(i + 1, range_):
+                idx_i = self.index_numpy_to_pandas(i)
+                idx_j = self.index_numpy_to_pandas(j)
+                distances[i, j] = self.METRIC(x.loc[idx_i], x.loc[idx_j])
+
+        # Usar a conversao de indice de numpy para pandas
+        range_ = x.shape[0]
+        distances = np.zeros((range_, range_))
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            futures = []
+            for i in range(range_):
+                # Passar da posicao i ate o range_
+                futures.append(
+                    executor.submit(computar_distancias_da_linha, distances, i, range_, x)
+                )
+
+            logging.debug("Aguardando futures...")
+            executor.shutdown(wait=True)
+            logging.debug("Futures finalizados")
+
+        return distances
