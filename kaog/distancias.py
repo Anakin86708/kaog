@@ -106,7 +106,10 @@ class Distancias:
 
         :return: Dicionário com o índice do DataFrame como chave e o índice da matriz como valor.
         :rtype: Dict[int, int]
+        :raises ValueError: Se existirem índices repetidos sem `self.x`.
         """
+        if self.x.index.duplicated().any():
+            raise ValueError('Os índices não podem ser duplicados.')
         return {k: v for v, k in enumerate(self.x.index)}
 
     def _calcular_distancias_e_vizinhos(self) -> (np.ndarray, np.ndarray):
@@ -120,7 +123,7 @@ class Distancias:
         k = self.x.shape[0]
         x = self._categoricos_para_numericos(self.x)
         logging.debug('Calculando distâncias e vizinhos...')
-        distances = self._computar_distancias(x)
+        # distances = self._computar_distancias(x)
         nn = NearestNeighbors(n_neighbors=k, metric=self.METRIC, n_jobs=1, algorithm='ball_tree').fit(x)
 
         # Decrementa k para considerar o próprio ponto

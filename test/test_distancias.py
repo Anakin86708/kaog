@@ -28,12 +28,17 @@ class DistanciasTest(unittest.TestCase):
         self.assertIsInstance(instance, Distancias)
 
     def test_create_map_pandas_to_numpy(self):
-        k, x = self.k, self.x.copy()
-        x.set_index(np.random.randint(0, 255, size=x.shape[0]), inplace=True)
-        instance = Distancias(x)
-        map_idx = instance._create_map_pandas_to_numpy()
-        for expected_idx, idx in enumerate(x.index):
-            self.assertEqual(expected_idx, map_idx[idx])
+        for _ in range(50):
+            with self.subTest():
+                k, x = self.k, self.x.copy()
+                x.set_index(np.random.randint(0, 255, size=x.shape[0]), inplace=True)
+                if x.index.duplicated().any():
+                    self.assertRaises(ValueError, Distancias, x)
+                else:
+                    instance = Distancias(x)
+                    map_idx = instance._create_map_pandas_to_numpy()
+                    for expected_idx, idx in enumerate(x.index):
+                        self.assertEqual(expected_idx, map_idx[idx])
 
     def test_calcular_distancias_e_vizinhos(self):
         k, x = self.k, self.x.copy()
