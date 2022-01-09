@@ -47,7 +47,7 @@ class DistanciasTest(unittest.TestCase):
         shape_ = x.shape[0] - 1  # Desconsidera o próprio elemento
         for k in range(self.k, x.shape[0]):
             instance.k = k
-            distancias, vizinhos = instance._calcular_distancias_e_vizinhos()
+            distancias, vizinhos = instance._calcular_distancias_e_vizinhos(x)
             self.assertEqual(x.shape[0], vizinhos.shape[0])
             self.assertEqual(x.shape[0], distancias.shape[0])
             self.assertEqual(shape_, vizinhos.shape[1])
@@ -68,8 +68,9 @@ class DistanciasTest(unittest.TestCase):
         """Deve ter todos os vizinhos mais proximos de um elemento."""
         k, x = self.k, self.x.copy()
         instance = Distancias(x)
+        input_ = pd.Series(name=6)
 
-        proximos = instance.k_vizinhos_mais_proximos_de(6)
+        proximos = instance.k_vizinhos_mais_proximos_de(input_)
         expected = np.array([0, 1, 3, 4, 2, 5])
         np.testing.assert_array_equal(expected, proximos)
 
