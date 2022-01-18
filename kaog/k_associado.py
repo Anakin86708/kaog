@@ -57,7 +57,7 @@ class KAssociado(DrawableGraph):
     @property
     def x(self) -> pd.DataFrame:
         """Dados sem classe associada."""
-        return self.data.drop(NOME_COLUNA_Y, axis=1)
+        return self.data.drop(NOME_COLUNA_Y, axis=1, errors='ignore')
 
     @property
     def y(self) -> pd.Series:
