@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from kaog.k_associado import KAssociado
-from kaog.util import NOME_COLUNA_Y
+from kaog.util import ColunaYSingleton
 
 
 class KAssociadoTest(unittest.TestCase):
@@ -21,7 +21,7 @@ class KAssociadoTest(unittest.TestCase):
             (0, -1),
         ]
         self.x = pd.DataFrame(x)
-        self.y = pd.Series([0, 0, 0, 1, 1, 1, 0], index=self.x.index, name=NOME_COLUNA_Y)
+        self.y = pd.Series([0, 0, 0, 1, 1, 1, 0], index=self.x.index, name=ColunaYSingleton().NOME_COLUNA_Y)
         self.data = pd.concat([self.x, self.y], axis=1)
 
     def test_k_associado(self):
@@ -29,7 +29,7 @@ class KAssociadoTest(unittest.TestCase):
             with self.subTest():
                 k, x = self.k, self.x.copy()
                 x.set_index(np.random.randint(0, 255, size=x.shape[0]), inplace=True)
-                y = pd.Series([0, 0, 0, 1, 1, 1, 0], index=x.index, name=NOME_COLUNA_Y)
+                y = pd.Series([0, 0, 0, 1, 1, 1, 0], index=x.index, name=ColunaYSingleton().NOME_COLUNA_Y)
                 if x.index.duplicated().any():
                     self.assertRaises(ValueError, KAssociado, k, pd.concat([x, y], axis=1))
                 else:
@@ -43,7 +43,7 @@ class KAssociadoTest(unittest.TestCase):
     def test_x(self):
         k, x = self.k, self.x.copy()
         x.columns = pd.Index([0, 1], dtype='object')
-        y = pd.Series([0, 0, 0, 1, 1, 1, 0], index=x.index, name=NOME_COLUNA_Y)
+        y = pd.Series([0, 0, 0, 1, 1, 1, 0], index=x.index, name=ColunaYSingleton().NOME_COLUNA_Y)
         data = pd.concat([x, y], axis=1)
         instance = KAssociado(k, data)
         pd.testing.assert_frame_equal(x, instance.x)

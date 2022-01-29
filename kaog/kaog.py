@@ -8,7 +8,7 @@ import pandas as pd
 from kaog.distancias import Distancias
 from kaog.grafo_otimo import GrafoOtimo
 from kaog.k_associado import KAssociado
-from kaog.util import NOME_COLUNA_Y
+from kaog.util import ColunaYSingleton
 from kaog.util.draw import DrawableGraph
 
 
@@ -44,12 +44,12 @@ class KAOG(DrawableGraph):
     @property
     def x(self) -> pd.DataFrame:
         """Dados sem a classe."""
-        return self.data.drop(NOME_COLUNA_Y, axis=1)
+        return self.data.drop(ColunaYSingleton().NOME_COLUNA_Y, axis=1)
 
     @property
     def y(self) -> pd.Series:
         """Informação de classe."""
-        return self.data[NOME_COLUNA_Y]
+        return self.data[ColunaYSingleton().NOME_COLUNA_Y]
 
     @property
     def grafo(self):
