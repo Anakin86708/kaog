@@ -5,7 +5,7 @@ import networkx as nx
 import pandas as pd
 
 from kaog.distancias import Distancias
-from kaog.util import NOME_COLUNA_Y
+from kaog.util import ColunaYSingleton
 from kaog.util.draw import DrawableGraph
 
 
@@ -57,12 +57,12 @@ class KAssociado(DrawableGraph):
     @property
     def x(self) -> pd.DataFrame:
         """Dados sem classe associada."""
-        return self.data.drop(NOME_COLUNA_Y, axis=1, errors='ignore')
+        return self.data.drop(ColunaYSingleton().NOME_COLUNA_Y, axis=1, errors='ignore')
 
     @property
     def y(self) -> pd.Series:
         """Classe de cada vértice."""
-        return self.data[NOME_COLUNA_Y]
+        return self.data[ColunaYSingleton().NOME_COLUNA_Y]
 
     @property
     def componentes(self) -> List[frozenset[int]]:

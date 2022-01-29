@@ -10,7 +10,7 @@ from matplotlib.lines import Line2D
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import MinMaxScaler
 
-from kaog.util import NOME_COLUNA_Y
+from kaog.util import ColunaYSingleton
 
 
 class DrawableGraph(ABC):
@@ -106,7 +106,7 @@ class DrawableGraph(ABC):
         """Colorir os vértices de acordo com a classe."""
         # Iterar os vértices de cada classe
         for i, classe in enumerate(y_unique):
-            vertices = self.data[self.data[NOME_COLUNA_Y] == classe].index
+            vertices = self.data[self.data[ColunaYSingleton().NOME_COLUNA_Y] == classe].index
             # color = scaller.transform(np.array([1]).reshape(1, -1))[0][0]
 
             nx.draw(
@@ -130,11 +130,15 @@ class DrawableGraph(ABC):
             cords = self.x.to_dict(orient='index')
         else:
             # Precisa de t-SNE
-            tsne = TSNE(init='pca', learning_rate='auto', n_jobs=-1)
-            tsne_cords = pd.DataFrame(tsne.fit_transform(self.x), index=self.x.index)
+            tsne_cords = self._get_tsne()
             cords = tsne_cords.to_dict(orient='index')
 
         # Remover os dicionários internos e utilizar listas
         for k, v in cords.items():
             cords[k] = np.array([x for x in v.values()]) * scale_coords
         return cords
+
+    def _get_tsne(self):
+        tsne = TSNE(init='pca', learning_rate='auto', n_jobs=-1)
+        tsne_cords = pd.DataFrame(tsne.fit_transform(self.x), index=self.x.index)
+        return tsne_cords

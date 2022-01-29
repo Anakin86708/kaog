@@ -3,7 +3,7 @@ import unittest
 import pandas as pd
 
 from kaog import KAOG, KAssociado
-from kaog.util import NOME_COLUNA_Y
+from kaog.util import ColunaYSingleton
 
 
 class KAOGTest(unittest.TestCase):
@@ -21,7 +21,7 @@ class KAOGTest(unittest.TestCase):
             (2, -2),
         ]
         self.x = pd.DataFrame(x)
-        self.y = pd.Series([0, 0, 0, 1, 1, 1, 0, 0, 0], index=self.x.index, name=NOME_COLUNA_Y)
+        self.y = pd.Series([0, 0, 0, 1, 1, 1, 0, 0, 0], index=self.x.index, name=ColunaYSingleton().NOME_COLUNA_Y)
         self.data = pd.concat([self.x, self.y], axis=1)
 
     def test_instance_kaog(self):
