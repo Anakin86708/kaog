@@ -1,5 +1,5 @@
 from statistics import mean
-from typing import Dict, Set, Union, List
+from typing import Dict, Set, Union, List, FrozenSet
 
 import networkx as nx
 import pandas as pd
@@ -65,7 +65,7 @@ class KAssociado(DrawableGraph):
         return self.data[ColunaYSingleton().NOME_COLUNA_Y]
 
     @property
-    def componentes(self) -> List[frozenset[int]]:
+    def componentes(self) -> List[FrozenSet[int]]:
         """Componentes do grafo."""
         return list(map(frozenset, self._gen_componentes()))
 
@@ -74,16 +74,16 @@ class KAssociado(DrawableGraph):
         """Cria a lista de arestas do grafo, considerando os vizinhos."""
         return [(x, y) for x in vizinhos for y in vizinhos[x]]
 
-    def pureza(self, componente: Union[int, Set[int], frozenset[int]]) -> float:
+    def pureza(self, componente: Union[int, Set[int], FrozenSet[int]]) -> float:
         """
         Calcula a pureza do componente ao qual o vértice pertence.
 
         :param componente: Vértice contido no componente a ser calculado ou todo o componente.
-        :type componente: Union[int, Set[int]]
+        :type componente: Union[int, Set[int], FrozenSet[int]
         :return: Valor da pureza do componente.
         :rtype: float
         :raises ValueError: Se o componente ou vértice não pertence ao grafo.
-        :raises TypeError: Se o tipo do argumento `componente` não for int ou Set[int].
+        :raises TypeError: Se o tipo do argumento `componente` não for int, Set[int] ou FrozenSet[int.
         """
         vertice_pertencente = self._sanitize_pureza(componente)
 
@@ -110,16 +110,16 @@ class KAssociado(DrawableGraph):
         """Gerador para os componentes do grafo."""
         return nx.algorithms.weakly_connected_components(self.grafo)
 
-    def _sanitize_pureza(self, componente: Union[int, Set[int], frozenset[int]]):
+    def _sanitize_pureza(self, componente: Union[int, Set[int], FrozenSet[int]]):
         """
         Com base no tipo do componente, retorna ao menos um vértice pertencente ao componente.
 
         :param componente: Podem ser um vértice ou um conjunto de vértices.
-        :type componente: Union[int, Set[int]]
+        :type componente: Union[int, Set[int], FrozenSet[int]
         :return: Vértice pertencente ao componente.
         :rtype: int
         :raises ValueError: Se o componente ou vértice não pertence ao grafo.
-        :raises TypeError: Se o tipo do argumento `componente` não for int, Set[int] ou frozenset[int].
+        :raises TypeError: Se o tipo do argumento `componente` não for int, Set[int] ou FrozenSet[int].
         """
         if isinstance(componente, set) or isinstance(componente, frozenset):
             if componente not in self.componentes:
@@ -128,7 +128,7 @@ class KAssociado(DrawableGraph):
         elif isinstance(componente, int):
             vertice_pertencente = componente
         else:
-            raise TypeError(f'O argumento `componente` deve ser int, Set[int] ou frozenset[int].')
+            raise TypeError(f'O argumento `componente` deve ser int, Set[int] ou FrozenSet[int].')
         return vertice_pertencente
 
     # noinspection PyTypeChecker
@@ -147,14 +147,14 @@ class KAssociado(DrawableGraph):
             graus.append(sum(map(self.grafo.degree, comp)))
         return mean(graus)
 
-    def obter_componentes_contendo(self, vertice: int) -> frozenset[int]:
+    def obter_componentes_contendo(self, vertice: int) -> FrozenSet[int]:
         """
         Obtém o componente conectado ao vértice.
 
         :param vertice: Vértice a ser buscado.
         :type vertice: int
         :return: Componente conectado ao vértice.
-        :rtype: frozenset[int]
+        :rtype: FrozenSet[int]
         :raises ValueError: Se o vértice não estiver conectado ao grafo.
         """
         for comp in self._gen_componentes():
@@ -185,12 +185,12 @@ class KAssociado(DrawableGraph):
 
     # noinspection PyTypeChecker
 
-    def _obter_media_grau_componente(self, componente: Union[Set[int], frozenset[int]]) -> float:
+    def _obter_media_grau_componente(self, componente: Union[Set[int], FrozenSet[int]]) -> float:
         """
         Obtém a média do grau dos vértices do componente conectado ao vértice.
 
         :param componente: Vértice a ser buscado.
-        :type componente: Set[int]
+        :type componente: Union[Set[int], FrozenSet[int]]
         :return: Média do grau dos vértices do componente conectado ao vértice.
         :rtype: float
         :raises ValueError: Se o vértice não estiver conectado ao grafo.
