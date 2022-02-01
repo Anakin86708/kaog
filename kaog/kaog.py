@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List
+from typing import Dict, List, FrozenSet
 
 import networkx as nx
 import numpy as np
@@ -32,7 +32,7 @@ class KAOG(DrawableGraph):
         self.cat_cols = colunas_categoricas.copy()
 
         self.grafos_associados: Dict[int, KAssociado] = {}
-        self.componentes_otimos: Dict[frozenset[int], int] = {}  # Mapeia o valor de k do componente escolhido
+        self.componentes_otimos: Dict[FrozenSet[int], int] = {}  # Mapeia o valor de k do componente escolhido
         self._criar_kaog()
         self._calcular_distancias_e_vizinhos()
 
@@ -112,26 +112,26 @@ class KAOG(DrawableGraph):
             if self._calcular_ultima_taxa() < ultima_taxa:
                 break
 
-    def _calcular_pureza_componentes_otimos(self, componentes_otimo: List[frozenset[int]]) -> np.ndarray:
+    def _calcular_pureza_componentes_otimos(self, componentes_otimo: List[FrozenSet[int]]) -> np.ndarray:
         """
         Calcula a pureza de *todos** os componentes ótimos.
 
         :param componentes_otimo: Componentes pertencentes ao grafo ótimo.
-        :type componentes_otimo: List[frozenset[int]]
+        :type componentes_otimo: List[FrozenSet[int]]
         :return: Array com a pureza de cada um dos componentes ótimos.
         :rtype: np.ndarray
         """
         return np.array([self.grafo_otimo.pureza(comp) for comp in componentes_otimo])
 
-    def _obter_componentes_otimos(self, componente_k: frozenset[int]) -> List[frozenset[int]]:
+    def _obter_componentes_otimos(self, componente_k: FrozenSet[int]) -> List[FrozenSet[int]]:
         """
         Com base no `componente_k`, encontrar todos os outros componentes que estão no grafo ótimo e que foram unidos
         para formar o `componente_k`.
 
         :param componente_k: Componente a ser buscado os componentes ótimos.
-        :type componente_k: frozenset[int]
+        :type componente_k: FrozenSet[int]
         :return: Lista contendo dos componentes ótimos que foram unidos para formar o `componente_k`.
-        :rtype: List[frozenset[int]]
+        :rtype: List[FrozenSet[int]]
         """
         componentes_otimo = []
         vertices_usados = set()  # Usado para saber quais vertices ja foram usados
