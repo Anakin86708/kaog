@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- Project information -----------------------------------------------------
 
 project = 'KAOG'
-copyright = '2021, Ariel Tadeu da Silva'
-author = 'Ariel Tadeu da Silva'
+copyright = '2022, Ariel Tadeu da Silva, Joao Roberto Bertini Jr.'
+author = 'Ariel Tadeu da Silva, Joao Roberto Bertini Jr.'
 
 # -- General configuration ---------------------------------------------------
 
